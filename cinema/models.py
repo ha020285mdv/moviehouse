@@ -26,9 +26,9 @@ class Movie(models.Model):
     starring = models.CharField(max_length=300)
     trailer = models.CharField(max_length=300, blank=True, null=True)
     teaser = models.CharField(max_length=300, blank=True, null=True)
-    img_landscape = models.ImageField(blank=True, null=True)
-    img_standard = models.ImageField(blank=True, null=True)
-    img_small = models.ImageField(blank=True, null=True)
+    img_landscape = models.ImageField(upload_to='img/%Y/%m/%d', blank=True, null=True)
+    img_standard = models.ImageField(upload_to='img/%Y/%m/%d', blank=True, null=True)
+    img_small = models.ImageField(upload_to='img/%Y/%m/%d', blank=True, null=True)
     age_policy = models.PositiveSmallIntegerField(choices=AGE_CHOICES, default=1)
 
     def __str__(self):

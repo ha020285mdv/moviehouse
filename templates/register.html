@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<section>
+  <div class="container" data-aos="fade-up">
+    <div class="row">
+      <div class="col-lg-12 text-center mb-5">
+        <h1 class="page-title">Register</h1>
+      </div>
+    </div>
+
+    <div class="row mb-5">
+
+      <div class="d-md-flex post-entry-2 half">
+        <a href="#" class="me-4 thumbnail">
+          <img src="{% static '/img/login.png' %}" alt="" class="img-fluid">
+        </a>
+        <div class="ps-md-5 mt-4 mt-md-0">
+
+            <div class="row justify-content-center mt-5">
+
+              <div class="col-lg-12">
+                <h5 class="comment-title">Enter your data:</h5>
+                <div class="row">
+
+                    <form method="post" action="{% url 'register' %}"><!-- ======= Register Form ======= -->
+                    {% csrf_token %}
+                    <div class="col-lg-6 mb-3">
+                      <label for="name">Your name:</label>
+                      <input type="text" class="form-control" name="first_name" id="register-name-field" value="{{ form.first_name.value|default_if_none:'' }}" placeholder="Your name">
+                      {{ form.first_name.errors }}
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                      <label for="email">Email:</label>
+                      <input type="text" class="form-control" name="email" id="register-email-field" value="{{ form.email.value|default_if_none:'' }}" placeholder="email@gmail.com">
+                      {{ form.email.errors }}
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                      <label for="password1">Password:</label>
+                      <input type="text" class="form-control" name="password1" id="register-password1-field" value="{{ form.password1.value|default_if_none:'' }}" placeholder="password">
+                      {{ form.password1.errors }}
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                      <label for="password2">Password again:</label>
+                      <input type="text" class="form-control" name="password2" id="register-password2-field" value="{{ form.password2.value|default_if_none:'' }}" placeholder="repeat password">
+                      {{ form.password2.errors }}
+                    </div>
+
+                    <div class="error-message">{{ form.non_field_errors }}</div>
+
+                    <div class="col-12">
+                      <input type="submit" class="btn btn-primary" value="Register"> or <a href="{% url 'login' %}">login</a>
+                    </div>
+
+                    </form><!-- End login Form -->
+
+
+
+
+
+
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+
+
+
+    </div>
+
+  </div>
+</section>
+
+
+{% endblock %}

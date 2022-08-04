@@ -1322,3 +1322,27 @@ section {
   width:100%;
   position:absolute;
 }
+
+#login-email-field{
+width: 300px
+}
+
+#login-password-field{
+width: 300px
+}
+
+#register-name-field{
+width: 300px
+}
+
+#register-email-field{
+width: 300px
+}
+
+#register-password1-field{
+width: 300px
+}
+
+#register-password2-field{
+width: 300px
+}

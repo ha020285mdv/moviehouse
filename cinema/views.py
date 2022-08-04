@@ -31,8 +31,7 @@ class RegisterView(CreateView):
 
 
 class LogoutView(LoginRequiredMixin, LogoutView):
-    next_page = '/'
-    login_url = 'login/'
+    success_url = '/'
 
 
 class IndexView(TemplateView):
