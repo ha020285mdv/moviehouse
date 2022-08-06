@@ -7,6 +7,7 @@ from moviehouse import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('cinema.urls')),
+    path('staff/', include('staff.urls')),
 ]
 
 

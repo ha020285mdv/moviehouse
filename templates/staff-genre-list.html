@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+{% load crispy_forms_tags %}
+
+<section>
+
+  <div class="container" data-aos="fade-up">
+    <div class="row">
+      <div class="col-lg-12 text-center mb-5">
+        <h1 class="page-title">Genre management</h1>
+      </div>
+    </div>
+
+    <div class="row mb-5">
+
+      <div class="d-md-flex post-entry-2 half">
+        <div class="ps-md-5 mt-4 mt-md-0">
+          <div class="post-meta mt-4">Genres</div>
+
+          <div>
+                  <table border = "0">
+                    {% for genre in object_list %}
+                    <tr>
+                        <td>{{genre.name}}</td>
+                        <td><a href="{% url 'genre-edit' genre.pk %}" class="btn btn-sm btn-warning">update</a></td>
+                        <td>
+                          <form method="post" action="{% url 'genre-delete' genre.pk %}">
+                              {% csrf_token %}
+                              <input type="hidden" name="pk" value="{{genre.pk}}">
+                              <button type="delete" class="btn btn-sm btn-danger">delete</button>
+                          </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+
+              <hr>
+
+              <form method="post" action="{% url 'genre-create' %}">
+                {% csrf_token %}
+                {{ create_form|crispy }}
+                <button type='submit' class='btn btn-success'>add new</button>
+              </form>
+
+          </div>
+
+      </div>
+
+
+      </div>
+
+    </div>
+
+
+  </div>
+</section>
+
+{% endblock %}

@@ -30,6 +30,7 @@ class Movie(models.Model):
     img_standard = models.ImageField(upload_to='img/%Y/%m/%d', blank=True, null=True)
     img_small = models.ImageField(upload_to='img/%Y/%m/%d', blank=True, null=True)
     age_policy = models.PositiveSmallIntegerField(choices=AGE_CHOICES, default=1)
+    advertised = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

@@ -2,10 +2,17 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, LoginView
-from django.views.generic import TemplateView, CreateView
+from django.views.generic import TemplateView, CreateView, ListView
 
 from cinema.forms import CustomUserCreationForm
-from cinema.models import CinemaUser
+from cinema.models import CinemaUser, Movie
+
+
+class IndexView(ListView):
+    template_name = 'index.html'
+    paginate_by = 10
+    queryset = Movie.objects.filter(advertised=True)
+    context_object_name = 'movies'
 
 
 class LoginView(LoginView):
@@ -34,5 +41,17 @@ class LogoutView(LoginRequiredMixin, LogoutView):
     success_url = '/'
 
 
-class IndexView(TemplateView):
-    template_name = 'index.html'
+class AccountView(TemplateView):
+    template_name = 'account.html'
+
+
+class ScheduleView(TemplateView):
+    template_name = 'schedule.html'
+
+
+class ContactView(TemplateView):
+    template_name = 'contact.html'
+
+
+class AboutView(TemplateView):
+    template_name = 'about.html'
