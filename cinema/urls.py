@@ -1,6 +1,6 @@
-from django.urls import path, include
-from cinema.views import IndexView, LoginView, RegisterView, LogoutView, AccountView
-from cinema.views import ScheduleView, ContactView, AboutView
+from django.urls import path
+from cinema.views import IndexView, LoginView, RegisterView, LogoutView, AccountView, SessionView, OrderView
+from cinema.views import ScheduleView, ContactView, AboutView, MovieView
 
 
 urlpatterns = [
@@ -12,5 +12,8 @@ urlpatterns = [
     path('schedule/', ScheduleView.as_view(), name='schedule'),
     path('contact/', ContactView.as_view(), name='contact'),
     path('about/', AboutView.as_view(), name='about'),
+    path('movie/<int:pk>/', MovieView.as_view(), name='movie'),
+    path('session/<int:pk>/', SessionView.as_view(), name='session'),
+    path('order/', OrderView.as_view(), name='order'),
 
 ]

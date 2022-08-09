@@ -22,33 +22,46 @@
           <div class="post-meta mt-4">Movies</div>
 
           <div>
-                  <table border = "0">
+               <table class="table">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">id</th>
+                      <th scope="col"></th>
+                      <th scope="col">title</th>
+                      <th scope="col">description</th>
+                      <th scope="col">genres</th>
+                      <th scope="col">director</th>
+                      <th scope="col">starring</th>
+                      <th scope="col">age</th>
+                      <th scope="col"></th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
                     {% for movie in object_list %}
                     <tr>
-                        <td><img src="{{movie.img_small.url}}"></td>
-                        <td>{{movie.title}}</td>
-                        <td>{% for genre in movie.genres.all %} {{genre}} {% endfor %}</td>
-                        <td>{{movie.description|truncatechars:20}}</td>
-                        <td>{{movie.director}}</td>
-                        <td>{{movie.starring}}</td>
-                        <td>{{movie.trailer}}</td>
-                        <td>{{movie.teaser}}</td>
-                        <td>{{movie.img_landscape}}</td>
-                        <td>{{movie.img_standard}}</td>
-                        <td>{{movie.get_age_policy_display}}</td>
-                        <td><a href="{% url 'movie-edit' movie.pk %}" class="btn btn-sm btn-warning">update</a></td>
-                        <td>
-                          <form method="post" action="{% url 'movie-delete' movie.pk %}">
+                      <th scope="row">{{movie.pk}}</th>
+                      <td>{% if movie.img_small %}<img src="{{movie.img_small.url}}" width="182" height="136">{% endif %}</td>
+                      <td>{{movie.title}}</td>
+                      <td>{{movie.description|truncatechars:20}}</td>
+                      <td>{% for genre in movie.genres.all %} {{genre}} {% endfor %}</td>
+                      <td>{{movie.director}}</td>
+                      <td>{{movie.starring}}</td>
+                      <td>{{movie.get_age_policy_display}}</td>
+                      <td><a href="{% url 'movie-edit' movie.pk %}" class="btn btn-sm btn-warning">update</a></td>
+                      <td><form method="post" action="{% url 'movie-delete' movie.pk %}">
                               {% csrf_token %}
                               <input type="hidden" name="pk" value="{{movie.pk}}">
                               <button type="delete" class="btn btn-sm btn-danger">delete</button>
                           </form>
-                        </td>
+                      </td>
                     </tr>
                     {% endfor %}
-                  </table>
 
-                <hr>
+                  </tbody>
+               </table>
+
 
                 <a href="{% url 'movie-create' %}"><button type='submit' class='btn btn-success'>add new</button></a>
 

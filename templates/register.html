@@ -40,12 +40,12 @@
                     </div>
                     <div class="col-lg-6 mb-3">
                       <label for="password1">Password:</label>
-                      <input type="text" class="form-control" name="password1" id="register-password1-field" value="{{ form.password1.value|default_if_none:'' }}" placeholder="password">
+                      <input type="password" class="form-control" name="password1" id="register-password1-field" value="{{ form.password1.value|default_if_none:'' }}" placeholder="password">
                       {{ form.password1.errors }}
                     </div>
                     <div class="col-lg-6 mb-3">
                       <label for="password2">Password again:</label>
-                      <input type="text" class="form-control" name="password2" id="register-password2-field" value="{{ form.password2.value|default_if_none:'' }}" placeholder="repeat password">
+                      <input type="password" class="form-control" name="password2" id="register-password2-field" value="{{ form.password2.value|default_if_none:'' }}" placeholder="repeat password">
                       {{ form.password2.errors }}
                     </div>
 

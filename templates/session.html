@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="movie-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-9 post-content" data-aos="fade-up">
+
+        <!-- ======= Single Post Content ======= -->
+        <div class="movie">
+            <div class="post-meta"><span class="date">{% for genre in object.settings.movie.genres.all %} {{genre}} / {% endfor %}</span>  <!--  <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span>--> </div>
+          <h1 class="mb-5">{{object.settings.movie.title}}</h1>
+          <h2 class="mb-5">{{object.date}} ({{object.settings.time_start}} - {{object.settings.time_end}})</h2>
+          <figcaption>age policy: {{object.settings.movie.get_age_policy_display}}</figcaption>
+          <p>screen: <font color="{{object.settings.hall.name }}">{{object.settings.hall.name}}</font></p>
+          <h2 class="mb-5">{{object.settings.price}}$</h2>
+
+
+
+          <form method="post" action="{% url 'order' %}">
+            {% for error in orderform.non_field_errors %}
+              <p>{{error}}</p>
+            {% endfor %}
+            {% csrf_token %}
+            <div class="sits mb-3">
+                <div class="btn-group-sm btn-block">
+                    {% for sit, value in object.sits.items %}
+                        <input type="checkbox" class="btn-check" id="btncheck{{sit}}" name="sit"  value="{{sit}}" {% if value %}disabled{% endif %}>
+                        <label class="btn btn-outline-primary btn-block" style="width:40px;" for="btncheck{{sit}}">{{sit}}</label>
+                        {% if forloop.counter in last_col_sits %}<br>{% endif %}
+                    {% endfor %}
+                </div>
+
+                    <br>
+            <input type="hidden" name="session" value="{{object.pk}}">
+            <button type="submit" class="btn btn-success">ORDER TICKETS</button>
+            </div>
+          </form>
+
+          <br>
+
+
+          <div class="aside-block">
+            <h3 class="aside-title">all sessions:</h3>
+            <ul class="aside-tags list-unstyled">
+                  {% for session in all_sessions %}
+                    <li><a href="{% url 'session' session.pk %}">{{session.date|date:'M d'}} {{session.settings.time_start|date:'H:i'}}</a></li>
+                  {% endfor %}
+            </ul>
+          </div>
+
+
+
+
+        </div><!-- End Single Post Content -->
+
+
+      </div>
+      <div class="col-md-3">
+        <!-- ======= Sidebar ======= -->
+
+        <div class="aside-block">
+          <h3 class="aside-title">Trailer</h3>
+          <div class="video-post">
+            <a href="{{ object.settings.movie.trailer }}" class="glightbox link-video">
+              <span class="bi-play-fill"></span>
+              <img src="https://img.youtube.com/vi/{{ object.settings.movie.trailer|slice:'17:' }}/sddefault.jpg" alt="" class="img-fluid">
+            </a>
+          </div>
+        </div><!-- End Trailer -->
+
+        <div class="aside-block">
+          <h3 class="aside-title">Tieser</h3>
+          <div class="video-post">
+            <a href="{{ object.settings.movie.teaser }}" class="glightbox link-video">
+              <span class="bi-play-fill"></span>
+              <img src="https://img.youtube.com/vi/{{ object.settings.movie.teaser|slice:'17:' }}/sddefault.jpg" alt="" class="img-fluid">
+            </a>
+          </div>
+        </div><!-- End Tieser -->
+
+        <div class="aside-block">
+          <h3 class="aside-title">STARRING</h3>
+           <figcaption>{{object.settings.movie.starring}}</figcaption>
+        </div><!-- End about -->
+        <div class="aside-block">
+          <h3 class="aside-title">DIRECTOR</h3>
+            <figcaption>{{object.settings.movie.director}}</figcaption>
+        </div><!-- End about -->
+        <div class="aside-block">
+          <h3 class="aside-title">ABOUT</h3>
+            <figcaption>{{object.settings.movie.description|linebreaks|truncatewords:30}}</figcaption>
+        </div><!-- End about -->
+
+        <div class="aside-block">
+              <img src="{{object.settings.movie.img_standard.url}}" alt="" class="img-fluid"  width="300" height="250">
+        </div><!-- End cover -->
+
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

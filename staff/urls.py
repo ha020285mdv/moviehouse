@@ -1,7 +1,11 @@
 from django.urls import path
-from staff.views import MainView, GenreListView, GenreCreateView, GenreDeleteView, GenreUpdateView
+from staff.views import MainView
+from staff.views import GenreListView, GenreCreateView, GenreDeleteView, GenreUpdateView
+from staff.views import MovieSessionSettingsUpdateView, MovieSessionSettingsDeleteView
+from staff.views import MovieSessionSettingsListView, MovieSessionSettingsCreateView
 from staff.views import MovieListView, MovieCreateView, MovieDeleteView, MovieUpdateView
 from staff.views import HallListView, HallCreateView, HallDeleteView, HallUpdateView
+from staff.views import MovieSessionsListView
 
 urlpatterns = [
     path('main/', MainView.as_view(), name='main'),
@@ -21,4 +25,10 @@ urlpatterns = [
     path('main/movie/delete/<int:pk>/', MovieDeleteView.as_view(), name='movie-delete'),
     path('main/movie/edit/<int:pk>/', MovieUpdateView.as_view(), name='movie-edit'),
 
+    path('main/session-settings-list/', MovieSessionSettingsListView.as_view(), name='settings-list'),
+    path('main/session-settings/create/', MovieSessionSettingsCreateView.as_view(), name='settings-create'),
+    path('main/session-settings/delete/<int:pk>/', MovieSessionSettingsDeleteView.as_view(), name='settings-delete'),
+    path('main/session-settings/edit/<int:pk>/', MovieSessionSettingsUpdateView.as_view(), name='settings-edit'),
+
+    path('main/sessions-list/', MovieSessionsListView.as_view(), name='sessions-list'),
 ]

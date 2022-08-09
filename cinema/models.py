@@ -58,6 +58,10 @@ class MovieSession(models.Model):
         return f'{self.settings.hall.name}: {self.date} ' \
                f'{self.settings.time_start} - "{self.settings.movie.title[:20]}..."'
 
+    class Meta:
+        ordering = ['date']
+
+
 
 class MovieSessionSettings(models.Model):
     hall = models.ForeignKey(Hall, on_delete=CASCADE)

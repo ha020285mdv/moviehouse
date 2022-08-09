@@ -12,10 +12,10 @@
 
               {% for movie in movies %}
                   <div class="swiper-slide">
-                    <a href="movie.html" class="img-bg d-flex align-items-end" style="background-image: url('{{movie.img_landscape.url}}');">
+                    <a href="{% url 'movie' movie.pk %}" class="img-bg d-flex align-items-end" style="background-image: url('{{movie.img_landscape.url}}');">
                       <div class="img-bg-inner">
                         <h2>{{ movie.title }}</h2>
-                        <p>{{ movie.description }}</p>
+                        <p>{{ movie.description|truncatewords:30 }}</p>
                       </div>
                     </a>
                   </div>
