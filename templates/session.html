@@ -9,7 +9,7 @@
         <!-- ======= Single Post Content ======= -->
         <div class="movie">
             <div class="post-meta"><span class="date">{% for genre in object.settings.movie.genres.all %} {{genre}} / {% endfor %}</span>  <!--  <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span>--> </div>
-          <h1 class="mb-5">{{object.settings.movie.title}}</h1>
+          <h1 class="mb-5"><a href="{% url 'movie' object.settings.movie.pk %}">{{object.settings.movie.title}}</a></h1>
           <h2 class="mb-5">{{object.date}} ({{object.settings.time_start}} - {{object.settings.time_end}})</h2>
           <figcaption>age policy: {{object.settings.movie.get_age_policy_display}}</figcaption>
           <p>screen: <font color="{{object.settings.hall.name }}">{{object.settings.hall.name}}</font></p>
@@ -33,7 +33,7 @@
 
                     <br>
             <input type="hidden" name="session" value="{{object.pk}}">
-            <button type="submit" class="btn btn-success">ORDER TICKETS</button>
+            {% if object.free_sits_number > 0 %}<button type="submit" class="btn btn-success">ORDER TICKETS</button>{% else %}SOLD OUT{% endif %}
             </div>
           </form>
 
@@ -88,14 +88,16 @@
             <figcaption>{{object.settings.movie.director}}</figcaption>
         </div><!-- End about -->
         <div class="aside-block">
+          <a href="{% url 'movie' object.settings.movie.pk %}">
           <h3 class="aside-title">ABOUT</h3>
             <figcaption>{{object.settings.movie.description|linebreaks|truncatewords:30}}</figcaption>
+
         </div><!-- End about -->
 
         <div class="aside-block">
               <img src="{{object.settings.movie.img_standard.url}}" alt="" class="img-fluid"  width="300" height="250">
         </div><!-- End cover -->
-
+        </a>
 
       </div>
     </div>

@@ -54,6 +54,15 @@ class MovieSession(models.Model):
     date = models.DateField()
     sits = models.JSONField()
 
+    @property
+    def free_sits_number(self):
+        return len([sit for sit, avaliblity in self.sits.items() if not avaliblity])
+
+    @property
+    def sold(self):
+        return len(self.sits) - self.free_sits_number
+
+
     class Meta:
         ordering = ['date']
 

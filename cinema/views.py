@@ -18,6 +18,7 @@ class IndexView(ListView):
     paginate_by = 10
     model = Movie
     context_object_name = 'movies'
+    extra_context = {'title': 'Head | Popcorn cinema'}
 
     def get_queryset(self):
         return self.model.objects.filter(advertised=True)
@@ -26,6 +27,7 @@ class IndexView(ListView):
 class LoginView(LoginView):
     success_url = '/'
     template_name = 'login.html'
+    extra_context = {'title': 'login | Popcorn cinema'}
 
     def get_success_url(self):
         return self.success_url
@@ -36,6 +38,7 @@ class RegisterView(CreateView):
     form_class = CustomUserCreationForm
     success_url = '/'
     template_name = 'register.html'
+    extra_context = {'title': 'register | Popcorn cinema'}
 
     def form_valid(self, form):
         to_return = super().form_valid(form)
@@ -54,6 +57,7 @@ class AccountView(ListView):
     paginate_by = 20
     model = Order
     context_object_name = 'orders'
+    extra_context = {'title': 'Account | Popcorn cinema'}
 
     def get_queryset(self):
         return self.model.objects.filter(customer=self.request.user).order_by('-session__date')
@@ -73,6 +77,7 @@ class MovieSessionsListView(ListView):
     model = MovieSession
     template_name = 'movie-session-list.html'
     paginate_by = 30
+    extra_context = {'title': 'Schedule | Popcorn cinema'}
 
     def get_queryset(self):
         movie = self.request.GET.get('filter_movie')
@@ -84,8 +89,7 @@ class MovieSessionsListView(ListView):
         orderprice = self.request.GET.get('orderprice')
         ordertime = self.request.GET.get('ordertime')
 
-        new_context = self.model.objects.filter(date__gte=timezone.now(),
-                                        settings__time_start__gte=timezone.now())
+        new_context = self.model.objects.filter(date__gte=timezone.now()).exclude(date=timezone.now(), settings__time_start__lte=timezone.now())
 
         if movie:
             new_context = new_context.filter(settings__movie__title=movie)
@@ -121,10 +125,12 @@ class MovieSessionsListView(ListView):
 
 class ContactView(TemplateView):
     template_name = 'contact.html'
+    extra_context = {'title': 'Contacts | Popcorn cinema'}
 
 
 class AboutView(TemplateView):
     template_name = 'about.html'
+    extra_context = {'title': 'About | Popcorn cinema'}
 
 
 class MovieView(DetailView):
@@ -133,6 +139,7 @@ class MovieView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['title'] = f'{self.object.title} | Popcorn cinema'
         context['today_sessions'] = MovieSession.objects.filter(settings__movie=self.object,
                                                         date=timezone.now(),
                                                         settings__time_start__gt=timezone.now())
@@ -147,7 +154,7 @@ class MovieView(DetailView):
 class SessionView(DetailView):
     model = MovieSession
     template_name = 'session.html'
-    extra_context = {'orderform': OrderForm}
+    extra_context = {'title': 'Order | Popcorn cinema', 'orderform': OrderForm}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

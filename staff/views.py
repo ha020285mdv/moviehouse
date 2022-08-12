@@ -18,12 +18,14 @@ class SuperUserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 
 class MainView(SuperUserRequiredMixin, TemplateView):
     template_name = 'admin.html'
+    extra_context = {'title': 'Main | Admin Popcorn cinema'}
+
 
 
 class GenreListView(SuperUserRequiredMixin, ListView):
     model = Genre
     template_name = 'staff-genre-list.html'
-    extra_context = {'create_form': GenreCreateForm()}
+    extra_context = {'title': 'Genres | Admin Popcorn cinema', 'create_form': GenreCreateForm()}
 
 
 class GenreCreateView(SuperUserRequiredMixin, CreateView):
@@ -31,6 +33,7 @@ class GenreCreateView(SuperUserRequiredMixin, CreateView):
     template_name = 'staff-genre-edit.html'
     form_class = GenreCreateForm
     success_url = reverse_lazy('genre')
+    extra_context = {'title': 'Genre create | Admin Popcorn cinema'}
 
 
 class GenreDeleteView(SuperUserRequiredMixin, DeleteView):
@@ -43,12 +46,13 @@ class GenreUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'staff-genre-edit.html'
     fields = '__all__'
     success_url = reverse_lazy('genre')
+    extra_context = {'title': 'Genre update | Admin Popcorn cinema'}
 
 
 class HallListView(SuperUserRequiredMixin, ListView):
     model = Hall
     template_name = 'staff-hall-list.html'
-    extra_context = {'create_form': HallCreateForm()}
+    extra_context = {'title': 'Halls | Admin Popcorn cinema', 'create_form': HallCreateForm()}
 
     def get_context_data(self, **kwargs):
         context = super(HallListView, self).get_context_data(**kwargs)
@@ -61,6 +65,8 @@ class HallCreateView(SuperUserRequiredMixin, CreateView):
     template_name = 'staff-hall-edit.html'
     form_class = HallCreateForm
     success_url = reverse_lazy('hall')
+    extra_context = {'title': 'Hall create | Admin Popcorn cinema'}
+
 
 
 class HallDeleteView(SuperUserRequiredMixin, DeleteView):
@@ -73,12 +79,14 @@ class HallUpdateView(LoginRequiredMixin, UpdateView):
     model = Hall
     form_class = HallUpdateForm
     success_url = reverse_lazy('hall')
+    extra_context = {'title': 'Hall update | Admin Popcorn cinema'}
 
 
 class MovieListView(SuperUserRequiredMixin, ListView):
     model = Movie
     template_name = 'staff-movie-list.html'
     paginate_by = 10
+    extra_context = {'title': 'Movies | Admin Popcorn cinema'}
 
     def get_context_data(self, **kwargs):
         context = super(MovieListView, self).get_context_data(**kwargs)
@@ -92,6 +100,7 @@ class MovieCreateView(SuperUserRequiredMixin, CreateView):
     template_name = 'staff-movie-edit.html'
     form_class = MovieUpdateForm
     success_url = reverse_lazy('movie-list')
+    extra_context = {'title': 'Movie create | Admin Popcorn cinema'}
 
 
 class MovieDeleteView(SuperUserRequiredMixin, DeleteView):
@@ -104,12 +113,14 @@ class MovieUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'staff-movie-edit.html'
     form_class = MovieUpdateForm
     success_url = reverse_lazy('movie-list')
+    extra_context = {'title': 'Movie update | Admin Popcorn cinema'}
 
 
 class MovieSessionSettingsListView(SuperUserRequiredMixin, ListView):
     model = MovieSessionSettings
     template_name = 'staff-movie-session-settings-list.html'
     paginate_by = 10
+    extra_context = {'title': 'Session settings | Admin Popcorn cinema'}
 
     def get_context_data(self, **kwargs):
         context = super(MovieSessionSettingsListView, self).get_context_data(**kwargs)
@@ -123,6 +134,7 @@ class MovieSessionSettingsCreateView(SuperUserRequiredMixin, CreateView):
     template_name = 'staff-movie-session-settings-edit.html'
     form_class = SettingsCreateForm
     success_url = reverse_lazy('settings-list')
+    extra_context = {'title': 'Setting create | Admin Popcorn cinema'}
 
 
 class MovieSessionSettingsDeleteView(SuperUserRequiredMixin, DeleteView):
@@ -135,7 +147,9 @@ class MovieSessionSettingsUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'staff-movie-session-settings-edit.html'
     form_class = SettingsCreateForm
     success_url = reverse_lazy('settings-list')
+    extra_context = {'title': 'Setting update | Admin Popcorn cinema'}
 
 
 class MovieSessionsStaffListView(SuperUserRequiredMixin, MovieSessionsListView):
     template_name = 'staff-movie-session-list.html'
+    extra_context = {'title': 'Movies | Admin Popcorn cinema'}

@@ -88,6 +88,7 @@
                       <th scope="col">start</th>
                       <th scope="col"></th>
                       <th scope="col">end</th>
+                      <th scope="col">sold</th>
                       <th scope="col">price</th>
                     </tr>
                   </thead>
@@ -95,13 +96,14 @@
                   <tbody>
                     {% for session in object_list %}
                     <tr>
-                      <th scope="row">{{session.pk}}</th>
+                      <th scope="row"><a href="{% url 'session' session.pk %}">{{session.pk}}</a></th>
                       <td><font color="{{session.settings.hall.name}}">{{session.settings.hall.name}}</font></td>
                       <td>{{session.settings.movie.title}}</td>
                       <td>{{session.date}}</td>
                       <td>{{session.settings.time_start}}</td>
                       <td>-</td>
                       <td>{{session.settings.time_end}}</td>
+                      <td>{{session.sold}}</td>
                       <td>{{session.settings.price}}$</td>
                     </tr>
                     {% endfor %}

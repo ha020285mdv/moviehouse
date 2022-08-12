@@ -37,9 +37,9 @@
                       <tbody>
                         {% for order in recent_orders %}
                         <tr class="bg-info">
-                          <td scope="row">{% if today == order.session.date %}today{% else %}{{order.session.date|date:'M.j,Y'}}{% endif %}</td>
+                          <td scope="row"><a href="{% url 'session' order.session.pk %}">{% if today == order.session.date %}today{% else %}{{order.session.date|date:'M.j,Y'}}{% endif %}</a></td>
                           <td><font color="{{order.session.settings.hall.name}}">{{order.session.settings.hall.name|upper}}</font></td>
-                          <td>{{order.session.settings.movie.title}}</td>
+                          <td><a href="{% url 'movie' order.session.settings.movie.pk %}">{{order.session.settings.movie.title}}</a></td>
                           <td>{{order.session.settings.price}}$</td>
                           <td>{% for key in order.sits %}<button type="button" class="btn btn-outline-secondary" style="width:40px;" >{{key}}</button>{% endfor %}</td>
                         </tr>
@@ -66,10 +66,10 @@
                         {% for order in orders %}
                         <tr
                          {% if today == order.session.date %}class="table-success"{% endif %}
-                         {% if today < order.session.date %}class="table-info"{% endif %}>
-                          <td scope="row">{% if today == order.session.date %}today{% else %}{{order.session.date|date:'M.j,Y'}}{% endif %}</td>
+                         {% if today < order.session.date %} class="table-info"{% endif %}>
+                        <td scope="row"><a href="{% url 'session' order.session.pk %}">{% if today == order.session.date %}today{% else %}{{order.session.date|date:'M.j,Y'}}{% endif %}</a></td>
                           <td><font color="{{order.session.settings.hall.name}}">{{order.session.settings.hall.name|upper}}</font></td>
-                          <td>{{order.session.settings.movie.title}}</td>
+                          <td><a href="{% url 'movie' order.session.settings.movie.pk %}">{{order.session.settings.movie.title}}</a></td>
                           <td>{{order.session.settings.price}}$</td>
                           <td>{% for key in order.sits %}<button type="button" class="btn btn-outline-secondary"  style="width:40px;" >{{key}}</button>{% endfor %}</td>
                         </tr>
