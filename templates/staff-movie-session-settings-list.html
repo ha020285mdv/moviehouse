@@ -49,11 +49,14 @@
                       <td>{{setting.time_start}}</td>
                       <td>{{setting.time_end}}</td>
                       <td>{{setting.price}}</td>
-                      <td><a href="{% url 'settings-edit' setting.pk %}" class="btn btn-sm btn-warning">update</a></td>
-                      <td><form method="post" action="{% url 'settings-delete' setting.pk %}">
+                      <td>{% if not setting in ordered %}<a href="{% url 'settings-edit' setting.pk %}" class="btn btn-sm btn-warning">update</a>{% endif %}</td>
+                      <td>
+                          {% if not setting in ordered %}
+                          <form method="post" action="{% url 'settings-delete' setting.pk %}">
                               {% csrf_token %}
                               <input type="hidden" name="pk" value="{{setting.pk}}">
                               <button type="delete" class="btn btn-sm btn-danger">delete</button>
+                          {% endif %}
                           </form>
                       </td>
                     </tr>
@@ -62,9 +65,9 @@
                   </tbody>
                </table>
 
-
                 <a href="{% url 'settings-create' %}"><button type='submit' class='btn btn-success'>add new</button></a>
-
+              <hr>
+              {% include 'pagination.html' %}
 
           </div>
 

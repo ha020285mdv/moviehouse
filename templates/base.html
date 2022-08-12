@@ -49,7 +49,20 @@
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a href="{% url 'index' %}">Blog</a></li>
+          {% if request.user.is_superuser %}
+          <li>admin: {{ user.email }}</li>
+          <li class="dropdown"><a href="{% url 'main' %}"><span>Admin menu</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+                <ul>
+                  <li><a href="{% url 'genre' %}">Genres</a></li>
+                  <li><a href="{% url 'hall' %}">Halls</a></li>
+                  <li><a href="{% url 'movie-list' %}">Movies</a></li>
+                  <li><a href="{% url 'settings-list' %}">Session settings</a></li>
+                  <li><a href="{% url 'sessions-list' %}">Sessions</a></li>
+                </ul>
+          </li>
+          {% endif %}
+          {% if not request.user.is_superuser %}
+          <li><a href="{% url 'index' %}">Home</a></li>
           <li><a href="{% url 'schedule' %}">Schedule</a></li>
 
           <li class="dropdown"><a href="category.html"><span>Categories</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
@@ -72,19 +85,22 @@
           </li>
           <li><a href="{% url 'about' %}">About</a></li>
           <li><a href="{% url 'contact' %}">Contact</a></li>
+          {% endif %}
           {% if user.is_authenticated %}
-          <li><a href="{% url 'account' %}">My ACCOUNT</a></li>
+          <li class="dropdown"><a href={% url 'account' %}><span>my ACCOUNT</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+            <ul>
+              <li><a href="{% url 'account' %}">ACCOUNT</a></li>
+              <li><a href="{% url 'logout' %}">logout</a></li>
+            </ul>
+          </li>
           {% else %}
-          <li class="dropdown"><a href="category.html"><span>enter ACCOUNT</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+          <li class="dropdown"><a href={% url 'login' %}><span>enter ACCOUNT</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
             <ul>
               <li><a href="{% url 'login' %}">login</a></li>
               <li><a href="{% url 'register' %}">register</a></li>
             </ul>
           </li>
           {% endif %}
-
-
-
         </ul>
       </nav><!-- .navbar -->
 
@@ -114,8 +130,18 @@
 
 
 
-
   <main id="main">
+
+    {% if messages %}
+  <ul class="messages">
+      {% for message in messages %}
+      <li
+              {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}
+      </li>
+      {% endfor %}
+  </ul>
+{% endif %}
+
        {% block content %}
 
        {% endblock %}
@@ -127,10 +153,13 @@
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
 
-    <div class="footer-content">
-      <div class="container">
 
+
+    <div class="footer-content">
+
+      <div class="container">
         <div class="row g-5">
+          {% if not request.user.is_superuser %}
           <div class="col-lg-4">
             <h3 class="footer-heading">About ZenBlog</h3>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam ab, perspiciatis beatae autem deleniti voluptate nulla a dolores, exercitationem eveniet libero laudantium recusandae officiis qui aliquid blanditiis omnis quae. Explicabo?</p>
@@ -147,6 +176,7 @@
               <li><a href="contact.html"><i class="bi bi-chevron-right"></i> Contact</a></li>
             </ul>
           </div>
+          {% endif %}
 
 
           <div class="col-lg-4">
@@ -227,9 +257,9 @@
           </div>
 
         </div>
-
       </div>
     </div>
+
 
   </footer>
 

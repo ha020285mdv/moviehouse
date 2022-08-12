@@ -27,13 +27,15 @@
                     <tr>
                         <td><font color="{{hall.name}}">{{hall.name}}</font></td>
                         <td>{% widthratio hall.sits_rows 1 hall.sits_cols %} sits</td>
-                        <td><a href="{% url 'hall-edit' hall.pk %}" class="btn btn-sm btn-warning">update</a></td>
+                        <td>{% if not hall in ordered %}<a href="{% url 'hall-edit' hall.pk %}" class="btn btn-sm btn-warning">update</a>{% endif %}</td>
                         <td>
+                          {% if not hall in ordered %}
                           <form method="post" action="{% url 'hall-delete' hall.pk %}">
                               {% csrf_token %}
                               <input type="hidden" name="pk" value="{{hall.pk}}">
                               <button type="delete" class="btn btn-sm btn-danger">delete</button>
                           </form>
+                          {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

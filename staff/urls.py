@@ -1,5 +1,5 @@
 from django.urls import path
-from staff.views import MainView
+from staff.views import MainView, MovieSessionsStaffListView
 from staff.views import GenreListView, GenreCreateView, GenreDeleteView, GenreUpdateView
 from staff.views import MovieSessionSettingsUpdateView, MovieSessionSettingsDeleteView
 from staff.views import MovieSessionSettingsListView, MovieSessionSettingsCreateView
@@ -30,5 +30,5 @@ urlpatterns = [
     path('main/session-settings/delete/<int:pk>/', MovieSessionSettingsDeleteView.as_view(), name='settings-delete'),
     path('main/session-settings/edit/<int:pk>/', MovieSessionSettingsUpdateView.as_view(), name='settings-edit'),
 
-    path('main/sessions-list/', MovieSessionsListView.as_view(), name='sessions-list'),
+    path('main/sessions-list/', MovieSessionsStaffListView.as_view(), name='sessions-list'),
 ]

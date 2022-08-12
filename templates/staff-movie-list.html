@@ -49,12 +49,15 @@
                       <td>{{movie.director}}</td>
                       <td>{{movie.starring}}</td>
                       <td>{{movie.get_age_policy_display}}</td>
-                      <td><a href="{% url 'movie-edit' movie.pk %}" class="btn btn-sm btn-warning">update</a></td>
-                      <td><form method="post" action="{% url 'movie-delete' movie.pk %}">
+                      <td>{% if not movie in ordered %}<a href="{% url 'movie-edit' movie.pk %}" class="btn btn-sm btn-warning">update</a>{% endif %}</td>
+                      <td>
+                          {% if not movie in ordered %}
+                          <form method="post" action="{% url 'movie-delete' movie.pk %}">
                               {% csrf_token %}
                               <input type="hidden" name="pk" value="{{movie.pk}}">
                               <button type="delete" class="btn btn-sm btn-danger">delete</button>
                           </form>
+                          {% endif %}
                       </td>
                     </tr>
                     {% endfor %}

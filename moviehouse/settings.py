@@ -39,6 +39,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'cinema.middlewares.CustomUserActivityCheckerMiddleware',
 ]
 
 ROOT_URLCONF = 'moviehouse.urls'
@@ -134,3 +135,5 @@ AUTH_USER_MODEL = 'cinema.CinemaUser'
 LOGOUT_REDIRECT_URL = 'login'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+MINUTES_TO_LOGOUT_IF_INACTIVE = 100

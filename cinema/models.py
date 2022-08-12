@@ -54,23 +54,28 @@ class MovieSession(models.Model):
     date = models.DateField()
     sits = models.JSONField()
 
+    class Meta:
+        ordering = ['date']
+
     def __str__(self):
         return f'{self.settings.hall.name}: {self.date} ' \
                f'{self.settings.time_start} - "{self.settings.movie.title[:20]}..."'
 
-    class Meta:
-        ordering = ['date']
+
 
 
 
 class MovieSessionSettings(models.Model):
     hall = models.ForeignKey(Hall, on_delete=CASCADE)
     movie = models.ForeignKey(Movie, on_delete=CASCADE)
-    date_start = models.DateField(default=timezone.now)
+    date_start = models.DateField(default=timezone.now().date(), validators=[MinValueValidator(timezone.now().date())])
     date_end = models.DateField()
     time_start = models.TimeField()
     time_end = models.TimeField()
-    price = models.PositiveSmallIntegerField()
+    price = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
+
+    class Meta:
+        ordering = ['-date_start']
 
     def __str__(self):
         return f'{self.movie} ({self.hall.name}) {self.date_start} to ' \

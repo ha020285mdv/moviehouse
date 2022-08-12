@@ -4,8 +4,8 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, LoginView
+from django.db.models import Count
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import TemplateView, CreateView, ListView, DetailView
 
@@ -16,8 +16,11 @@ from cinema.models import CinemaUser, Movie, MovieSession, Order
 class IndexView(ListView):
     template_name = 'index.html'
     paginate_by = 10
-    queryset = Movie.objects.filter(advertised=True)
+    model = Movie
     context_object_name = 'movies'
+
+    def get_queryset(self):
+        return self.model.objects.filter(advertised=True)
 
 
 class LoginView(LoginView):
@@ -46,12 +49,74 @@ class LogoutView(LoginRequiredMixin, LogoutView):
     success_url = '/'
 
 
-class AccountView(TemplateView):
+class AccountView(ListView):
     template_name = 'account.html'
+    paginate_by = 20
+    model = Order
+    context_object_name = 'orders'
+
+    def get_queryset(self):
+        return self.model.objects.filter(customer=self.request.user).order_by('-session__date')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['count'] = Order.objects.filter(customer=self.request.user).aggregate(Count('session'))
+        orders = Order.objects.filter(customer=self.request.user)
+        context['sum'] = sum([order.session.settings.price * len(order.sits) for order in orders])
+        context['today'] = timezone.now().date()
+        fresh_interval = timezone.now()-timedelta(minutes=15)
+        context['recent_orders'] = Order.objects.filter(customer=self.request.user, datetime__gte=fresh_interval)
+        return context
 
 
-class ScheduleView(TemplateView):
-    template_name = 'schedule.html'
+class MovieSessionsListView(ListView):
+    model = MovieSession
+    template_name = 'movie-session-list.html'
+    paginate_by = 30
+
+    def get_queryset(self):
+        movie = self.request.GET.get('filter_movie')
+        hall = self.request.GET.get('filter_hall')
+        time_start = self.request.GET.get('time_start')
+        time_end = self.request.GET.get('time_end')
+        date_start = self.request.GET.get('date_start')
+        date_end = self.request.GET.get('date_end')
+        orderprice = self.request.GET.get('orderprice')
+        ordertime = self.request.GET.get('ordertime')
+
+        new_context = self.model.objects.filter(date__gte=timezone.now(),
+                                        settings__time_start__gte=timezone.now())
+
+        if movie:
+            new_context = new_context.filter(settings__movie__title=movie)
+        if hall:
+            new_context = new_context.filter(settings__hall__name=hall)
+        if time_start:
+            new_context = new_context.filter(settings__time_start__gte=time_start)
+        if time_end:
+            new_context = new_context.filter(settings__time_start__lte=time_end)
+        if date_start:
+            new_context = new_context.filter(date__gte=date_start)
+        if date_end:
+            new_context = new_context.filter(date__lte=date_end)
+
+        if orderprice == "asc":
+            new_context = new_context.order_by('settings__price')
+        elif orderprice == "desc":
+            new_context = new_context.order_by('-settings__price')
+        if ordertime == "asc":
+            new_context = new_context.order_by('settings__time_start')
+        elif ordertime == "desc":
+            new_context = new_context.order_by('-settings__time_start')
+
+        return new_context
+
+    def get_context_data(self, **kwargs):
+        context = super(MovieSessionsListView, self).get_context_data(**kwargs)
+        context['unique_halls'] = self.get_queryset().order_by('settings__hall').distinct('settings__hall')
+        context['unique_movies'] = self.get_queryset().order_by('settings__movie').distinct('settings__movie')
+        context['previous'] = self.request.GET
+        return context
 
 
 class ContactView(TemplateView):
@@ -94,11 +159,16 @@ class SessionView(DetailView):
         return context
 
 
-class OrderView(CreateView):
+class OrderView(LoginRequiredMixin, CreateView):
     form_class = OrderForm
     success_url = 'account'
+    login_url = 'login'
 
     def post(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            messages.error(self.request, "Login, please, before order")
+            return redirect('login')
+
         form = self.form_class(request.POST, request=request)
         if form.is_valid():
             sits = dict.fromkeys(request.POST.getlist("sit", []), True)
@@ -108,13 +178,10 @@ class OrderView(CreateView):
                                  sits=sits)
             session.sits.update(sits)
             session.save()
+            messages.success(self.request, "Your purchase is done. Tickets are in your account")
             return redirect('account')
         else:
-            return redirect(self.request.META.get('HTTP_REFERER'), {'orderform': form})
+            for msg in form.errors.as_data().get("__all__"):
+                messages.error(self.request, msg.message)
+            return redirect(self.request.META.get('HTTP_REFERER'), kwargs={'orderform': form})
 
-    def form_invalid(self, form):
-        # # Whatever you wanna do. This example simply reloads the list
-        # self.object_list = self.get_queryset()
-        # context = self.get_context_data(task_form=form)
-        # return self.render_to_response(context)
-        return redirect(self.request.META.get('HTTP_REFERER'), {'orderform': form})

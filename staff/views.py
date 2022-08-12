@@ -3,8 +3,10 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import TemplateView, CreateView, ListView, DeleteView, UpdateView
 
-from cinema.models import Genre, Hall, Movie, MovieSessionSettings, MovieSession
-from staff.forms import GenreCreateForm, HallCreateForm
+from cinema.models import Genre, Hall, Movie, MovieSessionSettings, MovieSession, Order
+from cinema.views import MovieSessionsListView
+from staff.forms import GenreCreateForm, HallCreateForm, HallUpdateForm, MovieUpdateForm, \
+    SettingsCreateForm
 
 
 class SuperUserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -48,6 +50,11 @@ class HallListView(SuperUserRequiredMixin, ListView):
     template_name = 'staff-hall-list.html'
     extra_context = {'create_form': HallCreateForm()}
 
+    def get_context_data(self, **kwargs):
+        context = super(HallListView, self).get_context_data(**kwargs)
+        context['ordered'] = [hall for hall in Hall.objects.all() if Order.objects.filter(session__settings__hall=hall)]
+        return context
+
 
 class HallCreateView(SuperUserRequiredMixin, CreateView):
     http_method_names = ['post']
@@ -62,9 +69,9 @@ class HallDeleteView(SuperUserRequiredMixin, DeleteView):
 
 
 class HallUpdateView(LoginRequiredMixin, UpdateView):
-    model = Hall
     template_name = 'staff-hall-edit.html'
-    fields = '__all__'
+    model = Hall
+    form_class = HallUpdateForm
     success_url = reverse_lazy('hall')
 
 
@@ -73,11 +80,17 @@ class MovieListView(SuperUserRequiredMixin, ListView):
     template_name = 'staff-movie-list.html'
     paginate_by = 10
 
+    def get_context_data(self, **kwargs):
+        context = super(MovieListView, self).get_context_data(**kwargs)
+        context['ordered'] = [movie for movie in Movie.objects.all() if
+                              Order.objects.filter(session__settings__movie=movie)]
+        return context
+
 
 class MovieCreateView(SuperUserRequiredMixin, CreateView):
     model = Movie
     template_name = 'staff-movie-edit.html'
-    fields = '__all__'
+    form_class = MovieUpdateForm
     success_url = reverse_lazy('movie-list')
 
 
@@ -89,7 +102,7 @@ class MovieDeleteView(SuperUserRequiredMixin, DeleteView):
 class MovieUpdateView(LoginRequiredMixin, UpdateView):
     model = Movie
     template_name = 'staff-movie-edit.html'
-    fields = '__all__'
+    form_class = MovieUpdateForm
     success_url = reverse_lazy('movie-list')
 
 
@@ -98,11 +111,17 @@ class MovieSessionSettingsListView(SuperUserRequiredMixin, ListView):
     template_name = 'staff-movie-session-settings-list.html'
     paginate_by = 10
 
+    def get_context_data(self, **kwargs):
+        context = super(MovieSessionSettingsListView, self).get_context_data(**kwargs)
+        context['ordered'] = [setting for setting in MovieSessionSettings.objects.all() if
+                              Order.objects.filter(session__settings=setting)]
+        return context
+
 
 class MovieSessionSettingsCreateView(SuperUserRequiredMixin, CreateView):
     model = MovieSessionSettings
     template_name = 'staff-movie-session-settings-edit.html'
-    fields = '__all__'
+    form_class = SettingsCreateForm
     success_url = reverse_lazy('settings-list')
 
 
@@ -114,45 +133,9 @@ class MovieSessionSettingsDeleteView(SuperUserRequiredMixin, DeleteView):
 class MovieSessionSettingsUpdateView(LoginRequiredMixin, UpdateView):
     model = MovieSessionSettings
     template_name = 'staff-movie-session-settings-edit.html'
-    fields = '__all__'
+    form_class = SettingsCreateForm
     success_url = reverse_lazy('settings-list')
 
 
-class MovieSessionsListView(SuperUserRequiredMixin, ListView):
-    model = MovieSession
+class MovieSessionsStaffListView(SuperUserRequiredMixin, MovieSessionsListView):
     template_name = 'staff-movie-session-list.html'
-    paginate_by = 30
-
-    def get_queryset(self):
-        movie = self.request.GET.get('filter_movie', '')
-        hall = self.request.GET.get('filter_hall', '')
-        time_start = self.request.GET.get('time_start', '')
-        time_end = self.request.GET.get('time_end', '')
-        date_start = self.request.GET.get('date_start', '')
-        date_end = self.request.GET.get('date_end', '')
-        order = self.request.GET.get('orderby', '')
-
-        new_context = self.model.objects.filter(date__gte=timezone.now(),
-                                        settings__time_start__gte=timezone.now())
-
-        if movie:
-            new_context = new_context.filter(settings__movie__title=movie)
-        if hall:
-            new_context = new_context.filter(settings__hall__name=hall)
-        if time_start:
-            new_context = new_context.filter(settings__time_start__gte=time_start)
-        if time_end:
-            new_context = new_context.filter(settings__time_start__lte=time_end)
-        if date_start:
-            new_context = new_context.filter(date__gte=date_start)
-        if date_end:
-            new_context = new_context.filter(date__lte=date_end)
-
-        return new_context
-
-    def get_context_data(self, **kwargs):
-        context = super(MovieSessionsListView, self).get_context_data(**kwargs)
-        context['unique_halls'] = self.get_queryset().order_by('settings__hall').distinct('settings__hall')
-        context['unique_movies'] = self.get_queryset().order_by('settings__movie').distinct('settings__movie')
-        return context
-

@@ -34,9 +34,7 @@ class OrderForm(ModelForm):
         cleaned_data = super().clean()
         sits = dict.fromkeys(self.request.POST.getlist("sit", []), True)
         session = MovieSession.objects.get(pk=self.request.POST.get("session"))
-        raise ValidationError('One or more sits from your order are not free already. Please choose new.')
+
         for sit in sits:
             if session.sits[sit]:
-                msg = "One or more sits from your order are not free already. Please choose new."
-                messages.success(self.request, msg)
                 raise ValidationError('One or more sits from your order are not free already. Please choose new.')

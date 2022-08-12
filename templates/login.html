@@ -34,14 +34,14 @@
                     </div>
                     <div class="col-lg-6 mb-3">
                       <label for="password">Password</label>
-                      <input type="text" class="form-control" name="password" id="login-password-field" value="{{ form.password.value|default_if_none:'' }}" placeholder="password">
+                      <input type="password" class="form-control" name="password" id="login-password-field" value="{{ form.password.value|default_if_none:'' }}" placeholder="password">
                       {{ form.password.errors }}
                     </div>
 
                     <div class="error-message">{{ form.non_field_errors }}</div>
 
                     <div class="col-12">
-                      <input type="submit" class="btn btn-primary" value="Enter in account">
+                        <input type="submit" class="btn btn-primary" value="Enter account"> or <a href="{% url 'register' %}">register</a>
                     </div>
                     </form><!-- End login Form -->
 

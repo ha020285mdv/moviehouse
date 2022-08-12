@@ -23,8 +23,64 @@
 
               <div class="col-lg-12">
                 <h5 class="comment-title">logined as {{ user.first_name }}</h5>
-                <p><a href="{% url 'logout' %}">-logout-</a></p>
+                <hr>
                 <div class="row">
+
+                  <p>{{sum}}$ TOTAL amount spent<br>
+                     {{count.session__count}} pcs purchases are done</p>
+
+                  {% if recent_orders %}
+                  <hr>
+                  <div>
+                  <h5 class="comment-title">Recently ordered:</h5>
+                  <table class="table">
+                      <tbody>
+                        {% for order in recent_orders %}
+                        <tr class="bg-info">
+                          <td scope="row">{% if today == order.session.date %}today{% else %}{{order.session.date|date:'M.j,Y'}}{% endif %}</td>
+                          <td><font color="{{order.session.settings.hall.name}}">{{order.session.settings.hall.name|upper}}</font></td>
+                          <td>{{order.session.settings.movie.title}}</td>
+                          <td>{{order.session.settings.price}}$</td>
+                          <td>{% for key in order.sits %}<button type="button" class="btn btn-outline-secondary" style="width:40px;" >{{key}}</button>{% endfor %}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                  </table>
+                  </div>
+                  <hr>
+                  {% endif %}
+
+
+                   <table class="table">
+                      <thead class="thead-light">
+                        <tr>
+                          <th scope="col">show</th>
+                          <th scope="col">hall</th>
+                          <th scope="col">movie</th>
+                          <th scope="col">price</th>
+                          <th scope="col">sits</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {% for order in orders %}
+                        <tr
+                         {% if today == order.session.date %}class="table-success"{% endif %}
+                         {% if today < order.session.date %}class="table-info"{% endif %}>
+                          <td scope="row">{% if today == order.session.date %}today{% else %}{{order.session.date|date:'M.j,Y'}}{% endif %}</td>
+                          <td><font color="{{order.session.settings.hall.name}}">{{order.session.settings.hall.name|upper}}</font></td>
+                          <td>{{order.session.settings.movie.title}}</td>
+                          <td>{{order.session.settings.price}}$</td>
+                          <td>{% for key in order.sits %}<button type="button" class="btn btn-outline-secondary"  style="width:40px;" >{{key}}</button>{% endfor %}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                   </table>
+                  {% include 'pagination.html' %}
+
+
+
+
 
 
 

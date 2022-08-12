@@ -12,7 +12,9 @@
           <h1 class="mb-5">{{object.title}}</h1>
 
           <figure class="my-4">
+            {% if object.img_standard %}
             <img src="{{object.img_standard.url}}" alt="" class="img-fluid"  width="900" height="571">
+            {% endif %}
             <figcaption>STARRING: {{object.starring}}</figcaption>
             <figcaption>DIRECTOR: {{object.director}}</figcaption>
             <figcaption>AGE POLICY: {{object.get_age_policy_display}}</figcaption>
@@ -22,6 +24,7 @@
 
           <br>
 
+        {% if all_sessions %}
         <div class="aside-block">
           <h3 class="aside-title">all sessions:</h3>
           <ul class="aside-tags list-unstyled">
@@ -30,6 +33,7 @@
                 {% endfor %}
           </ul>
         </div><!-- End Tags -->
+        {% endif %}
 
         </div><!-- End Single Post Content -->
 
