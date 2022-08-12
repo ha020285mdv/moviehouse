@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import CASCADE
 from django.utils import timezone
@@ -68,7 +68,7 @@ class MovieSession(models.Model):
 class MovieSessionSettings(models.Model):
     hall = models.ForeignKey(Hall, on_delete=CASCADE)
     movie = models.ForeignKey(Movie, on_delete=CASCADE)
-    date_start = models.DateField(default=timezone.now().date(), validators=[MinValueValidator(timezone.now().date())])
+    date_start = models.DateField(default=timezone.now)
     date_end = models.DateField()
     time_start = models.TimeField()
     time_end = models.TimeField()

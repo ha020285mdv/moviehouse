@@ -1,5 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
+from django.utils import timezone
+
 from cinema.models import Movie, Genre, Hall, Order
 from cinema.models import MovieSessionSettings
 
@@ -33,7 +35,6 @@ class MovieUpdateForm(ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        print(cleaned_data['advertised'])
         if cleaned_data['advertised'] and not \
                 (cleaned_data['trailer'] and cleaned_data['teaser'] and cleaned_data['img_landscape']):
             raise ValidationError("Media data are required for advertising")
@@ -56,6 +57,9 @@ class SettingsCreateForm(ModelForm):
         hall = cleaned_data['hall']
         date_start = cleaned_data['date_start']
         date_end = cleaned_data['date_end']
+        # avoid date end < start
+        if date_start < timezone.now().date():
+            raise ValidationError("Can not create sessions for past")
         # avoid date end < start
         if date_end < date_start:
             raise ValidationError("Date end can not be less than date start")

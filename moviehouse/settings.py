@@ -137,3 +137,6 @@ LOGOUT_REDIRECT_URL = 'login'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MINUTES_TO_LOGOUT_IF_INACTIVE = 100
+
+# Channels
+ASGI_APPLICATION = 'moviehouse.asgi.application'
