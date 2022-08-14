@@ -22,9 +22,15 @@ class MovieSerializer(serializers.ModelSerializer):
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
+    movie = serializers.CharField(source='settings.movie.title', read_only=True)
+    hall = serializers.CharField(source='settings.hall.name', read_only=True)
+    time_start = serializers.TimeField(source='settings.time_start', read_only=True)
+    time_end = serializers.TimeField(source='settings.time_end', read_only=True)
+    price = serializers.IntegerField(source='settings.price', read_only=True)
+
     class Meta:
         model = MovieSession
-        fields = '__all__'
+        fields = ['id', 'date', 'time_start', 'time_end', 'movie', 'hall', 'price', 'sits']
 
 
 class MovieSessionSettingsSerializer(serializers.ModelSerializer):

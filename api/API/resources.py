@@ -1,5 +1,8 @@
 from django.utils import timezone
+from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from api.API.permissions import IsAdminOrReadOnly, IsAdminOrCreateOnly, IsAdminOrCreateOnlyOrReadOwnForOrder, \
@@ -33,10 +36,18 @@ class MovieViewSet(ModelViewSet):
 class MovieSessionViewSet(ReadOnlyModelViewSet):
     queryset = MovieSession.objects.all()
     serializer_class = MovieSessionSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['hall', 'time_start', 'time_end']
 
     def get_queryset(self):
         return MovieSession.objects.filter(date__gte=timezone.now())\
             .exclude(date=timezone.now(), settings__time_start__lte=timezone.now())
+
+    @action(detail=False, methods=['get'])
+    def todays(self, request):
+        queryset = self.get_queryset().filter(date=timezone.now(), settings__time_start__gt=timezone.now())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class MovieSessionSettingsViewSet(ModelViewSet):
