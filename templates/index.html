@@ -45,10 +45,32 @@
         <div class="row g-5">
           <div class="col-lg-4">
             <div class="post-entry-1 lg">
-              <a href="movie.html"><img src="static/img/post-landscape-1.jpg" alt="" class="img-fluid"></a>
-              <div class="post-meta"><span class="date">Culture</span> <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span></div>
-              <h2><a href="movie.html">11 Work From Home Part-Time Jobs You Can Do Now</a></h2>
-              <p class="mb-4 d-block">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Vero temporibus repudiandae, inventore pariatur numquam cumque possimus exercitationem? Nihil tempore odit ab minus eveniet praesentium, similique blanditiis molestiae ut saepe perspiciatis officia nemo, eos quae cumque. Accusamus fugiat architecto rerum animi atque eveniet, quo, praesentium dignissimos</p>
+                <p>TODAY</p>
+                <table class="table">
+                  <tbody>
+                    {% for session in todays_sessions %}
+                    <tr>
+                      <td><font color="{{session.settings.hall.name}}">{{session.settings.hall.name}}</font></td>
+                      <td>{{session.settings.time_start|date:'G:i'}}</td>
+                      <td><a href="{% url 'session' session.pk %}">{{session.settings.movie.title}}</a></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <p>TOMORROW</p>
+                <table class="table">
+                  <tbody>
+                    {% for session in tomorrows_sessions %}
+                    <tr>
+                      <td><font color="{{session.settings.hall.name}}">{{session.settings.hall.name}}</font></td>
+                      <td>{{session.settings.time_start|date:'G:i'}}</td>
+                      <td><a href="{% url 'session' session.pk %}">{{session.settings.movie.title}}</a></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+
+                 <a href="{% url 'schedule' %}"><button type="button" class="btn btn-outline-secondary">SEE ALL</button></a>
 
             </div>
 
@@ -86,7 +108,7 @@
               <div class="col-lg-4">
 
                 <div class="trending">
-                  <h3>Most watching</h3>
+                  <h3>Most visited</h3>
                   <ul class="trending-post">
                     <li>
                       <a href="movie.html">

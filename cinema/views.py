@@ -18,10 +18,21 @@ class IndexView(ListView):
     paginate_by = 10
     model = Movie
     context_object_name = 'movies'
-    extra_context = {'title': 'Head | Popcorn cinema'}
 
     def get_queryset(self):
         return self.model.objects.filter(advertised=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Head | Popcorn cinema'
+        context['todays_sessions'] = MovieSession.objects.filter(date=timezone.now().date(),
+                                                                 settings__time_start__gte=timezone.now()).\
+            order_by('settings__time_start')
+        context['tomorrows_sessions'] = MovieSession.objects.filter(date=(timezone.now() + timedelta(1))).\
+            order_by('settings__time_start')
+        context['bestsellers'] = ''  # implement
+        return context
+
 
 
 class LoginView(LoginView):
@@ -30,6 +41,8 @@ class LoginView(LoginView):
     extra_context = {'title': 'login | Popcorn cinema'}
 
     def get_success_url(self):
+        msg = 'You have been successfully logged in!'
+        messages.success(self.request, msg)
         return self.success_url
 
 
@@ -117,8 +130,9 @@ class MovieSessionsListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(MovieSessionsListView, self).get_context_data(**kwargs)
-        context['unique_halls'] = self.get_queryset().order_by('settings__hall').distinct('settings__hall')
-        context['unique_movies'] = self.get_queryset().order_by('settings__movie').distinct('settings__movie')
+        qs = self.get_queryset()
+        context['unique_halls'] = qs.order_by().distinct('settings__hall')
+        context['unique_movies'] = qs.order_by().distinct('settings__movie')
         context['previous'] = self.request.GET
         return context
 
@@ -191,4 +205,3 @@ class OrderView(LoginRequiredMixin, CreateView):
             for msg in form.errors.as_data().get("__all__"):
                 messages.error(self.request, msg.message)
             return redirect(self.request.META.get('HTTP_REFERER'), kwargs={'orderform': form})
-

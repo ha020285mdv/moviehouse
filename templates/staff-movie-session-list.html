@@ -100,9 +100,9 @@
                       <td><font color="{{session.settings.hall.name}}">{{session.settings.hall.name}}</font></td>
                       <td>{{session.settings.movie.title}}</td>
                       <td>{{session.date}}</td>
-                      <td>{{session.settings.time_start}}</td>
+                      <td>{{session.settings.time_start|date:'G:i'}}</td>
                       <td>-</td>
-                      <td>{{session.settings.time_end}}</td>
+                      <td>{{session.settings.time_end|date:'G:i'}}</td>
                       <td>{{session.sold}}</td>
                       <td>{{session.settings.price}}$</td>
                     </tr>

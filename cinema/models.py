@@ -32,14 +32,17 @@ class Movie(models.Model):
     age_policy = models.PositiveSmallIntegerField(choices=AGE_CHOICES, default=1)
     advertised = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['title']
+
     def __str__(self):
         return self.title
 
 
 class Hall(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    sits_rows = models.PositiveSmallIntegerField()
-    sits_cols = models.PositiveSmallIntegerField()
+    sits_rows = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
+    sits_cols = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
 
     @property
     def hall_capacity(self):
@@ -54,6 +57,9 @@ class MovieSession(models.Model):
     date = models.DateField()
     sits = models.JSONField()
 
+    class Meta:
+        ordering = ['date']
+
     @property
     def free_sits_number(self):
         return len([sit for sit, avaliblity in self.sits.items() if not avaliblity])
@@ -62,16 +68,9 @@ class MovieSession(models.Model):
     def sold(self):
         return len(self.sits) - self.free_sits_number
 
-
-    class Meta:
-        ordering = ['date']
-
     def __str__(self):
         return f'{self.settings.hall.name}: {self.date} ' \
                f'{self.settings.time_start} - "{self.settings.movie.title[:20]}..."'
-
-
-
 
 
 class MovieSessionSettings(models.Model):
@@ -90,7 +89,6 @@ class MovieSessionSettings(models.Model):
         return f'{self.movie} ({self.hall.name}) {self.date_start} to ' \
                f'{self.date_end} ({self.time_start}-{self.time_end}) {self.price}$'
 
-    # Может изменять зал или сеанс, если не было куплено ни одного билета в этот зал или на этот сеанс.
     def save(self, **kwargs):
         if self.id and True:    # check if empty
             MovieSession.objects.filter(settings=self).delete()

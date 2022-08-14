@@ -27,8 +27,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
+    'rest_framework',
+    'rest_framework.authtoken',
     'cinema',
     'staff',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -137,6 +140,22 @@ LOGOUT_REDIRECT_URL = 'login'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MINUTES_TO_LOGOUT_IF_INACTIVE = 100
+MINUTES_DRF_TOKEN_LIFE_TIME = 10000000000
 
 # Channels
 ASGI_APPLICATION = 'moviehouse.asgi.application'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100,
+
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'api.API.authetication.TokenWithLifeTimeAuthentication',
+    ]
+}

@@ -81,7 +81,6 @@
                <table class="table">
                   <thead class="thead-light">
                     <tr>
-                      <th scope="col">id</th>
                       <th scope="col">hall</th>
                       <th scope="col">movie</th>
                       <th scope="col">date</th>
@@ -96,13 +95,12 @@
                   <tbody>
                     {% for session in object_list %}
                     <tr>
-                      <th scope="row"><a href="{% url 'session' session.pk %}">{{session.pk}}</a></th>
                       <td><font color="{{session.settings.hall.name}}">{{session.settings.hall.name}}</font></td>
                       <td><a href="{% url 'movie' session.settings.movie.pk %}">{{session.settings.movie.title}}</a></td>
-                      <td>{{session.date}}</td>
-                      <td>{{session.settings.time_start}}</td>
+                      <td><a href="{% url 'session' session.pk %}">{{session.date}}</a></td>
+                      <td>{{session.settings.time_start|date:'G:i'}}</td>
                       <td>-</td>
-                      <td>{{session.settings.time_end}}</td>
+                      <td>{{session.settings.time_end|date:'G:i'}}</td>
                       <td>{{session.free_sits_number}}</td>
                       <td>{{session.settings.price}}$</td>
                     </tr>
