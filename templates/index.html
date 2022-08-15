@@ -110,44 +110,17 @@
                 <div class="trending">
                   <h3>Most visited</h3>
                   <ul class="trending-post">
-                    <li>
-                      <a href="movie.html">
-                        <span class="number">1</span>
-                        <h3>The Best Homemade Masks for Face</h3>
-                        <span class="author">Drama</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="movie.html">
-                        <span class="number">2</span>
-                        <h3>17 Pictures of Medium Length Hair </h3>
-                        <span class="author">Horror</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="movie.html">
-                        <span class="number">3</span>
-                        <h3>13 Amazing Poems </h3>
-                        <span class="author">Scy-fy</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="movie.html">
-                        <span class="number">4</span>
-                        <h3>9 Half-up/half-down </h3>
-                        <span class="author">Comedy</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="movie.html">
-                        <span class="number">5</span>
-                        <h3>9 Half-up/half-down </h3>
-                        <span class="author">Cartoon</span>
-                      </a>
-                    </li>
+                      {% for bestseller in bestsellers  %}
+                      <li>
+                        <a href="{% url 'movie' bestseller.pk %}">
+                          <span class="number">{{forloop.counter}}</span>
+                          <h3>{{bestseller}}</h3>
+                            <span class="author">{{bestseller.starring}}</span>
+                        </a>
+                      </li>
+                      {% endfor %}
                   </ul>
                 </div>
-
               </div> <!-- End Trending Section -->
             </div>
           </div>

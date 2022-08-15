@@ -1,7 +1,10 @@
+import datetime
+
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
+from django.utils import timezone
 
 from cinema.models import CinemaUser, Order, MovieSession
 
@@ -34,6 +37,10 @@ class OrderForm(ModelForm):
         cleaned_data = super().clean()
         sits = dict.fromkeys(self.request.POST.getlist("sit", []), True)
         session = MovieSession.objects.get(pk=self.request.POST.get("session"))
+        start = datetime.datetime.combine(session.date, session.settings.time_start)
+
+        if timezone.now() > start:
+            raise ValidationError('Current session is already expired.')
 
         for sit in sits:
             if session.sits[sit]:

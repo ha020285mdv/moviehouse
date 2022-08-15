@@ -62,7 +62,7 @@ class MovieSession(models.Model):
 
     @property
     def free_sits_number(self):
-        return len([sit for sit, avaliblity in self.sits.items() if not avaliblity])
+        return len([sit for sit, sold in self.sits.items() if not sold])
 
     @property
     def sold(self):
@@ -90,7 +90,7 @@ class MovieSessionSettings(models.Model):
                f'{self.date_end} ({self.time_start}-{self.time_end}) {self.price}$'
 
     def save(self, **kwargs):
-        if self.id and True:    # check if empty
+        if self.id:
             MovieSession.objects.filter(settings=self).delete()
         super().save(**kwargs)
         delta = self.date_end - self.date_start

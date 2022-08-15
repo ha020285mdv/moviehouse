@@ -26,13 +26,20 @@ class IndexView(ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Head | Popcorn cinema'
         context['todays_sessions'] = MovieSession.objects.filter(date=timezone.now().date(),
-                                                                 settings__time_start__gte=timezone.now()).\
+                                                                 settings__time_start__gte=timezone.now()). \
             order_by('settings__time_start')
-        context['tomorrows_sessions'] = MovieSession.objects.filter(date=(timezone.now() + timedelta(1))).\
+        context['tomorrows_sessions'] = MovieSession.objects.filter(date=(timezone.now() + timedelta(1))). \
             order_by('settings__time_start')
-        context['bestsellers'] = ''  # implement
-        return context
 
+        # calculating bestsellers
+        orders_last_30_days = Order.objects.filter(session__date__lte=timezone.now(),
+                                                   session__date__gte=(timezone.now() - timedelta(minutes=60*24*30)))
+        movies = {}
+        for order in orders_last_30_days:
+            movies[order.session.settings.movie] = movies.get(order.session.settings.movie, 0) + len(order.sits)
+        context['bestsellers'] = {k: v for k, v in sorted(movies.items(), key=lambda item: item[1], reverse=True)}
+
+        return context
 
 
 class LoginView(LoginView):
@@ -81,7 +88,7 @@ class AccountView(ListView):
         orders = Order.objects.filter(customer=self.request.user)
         context['sum'] = sum([order.session.settings.price * len(order.sits) for order in orders])
         context['today'] = timezone.now().date()
-        fresh_interval = timezone.now()-timedelta(minutes=15)
+        fresh_interval = timezone.now() - timedelta(minutes=15)
         context['recent_orders'] = Order.objects.filter(customer=self.request.user, datetime__gte=fresh_interval)
         return context
 
@@ -102,7 +109,8 @@ class MovieSessionsListView(ListView):
         orderprice = self.request.GET.get('orderprice')
         ordertime = self.request.GET.get('ordertime')
 
-        new_context = self.model.objects.filter(date__gte=timezone.now()).exclude(date=timezone.now(), settings__time_start__lte=timezone.now())
+        new_context = self.model.objects.filter(date__gte=timezone.now()).exclude(date=timezone.now(),
+                                                                                  settings__time_start__lte=timezone.now())
 
         if movie:
             new_context = new_context.filter(settings__movie__title=movie)
@@ -155,12 +163,15 @@ class MovieView(DetailView):
         context = super().get_context_data(**kwargs)
         context['title'] = f'{self.object.title} | Popcorn cinema'
         context['today_sessions'] = MovieSession.objects.filter(settings__movie=self.object,
-                                                        date=timezone.now(),
-                                                        settings__time_start__gt=timezone.now())
+                                                                date=timezone.now(),
+                                                                settings__time_start__gt=timezone.now()) \
+            .order_by('settings__time_start')
         next_day = timezone.now() + timedelta(1)
-        context['tomorrow_sessions'] = MovieSession.objects.filter(settings__movie=self.object, date=next_day)
+        context['tomorrow_sessions'] = MovieSession.objects.filter(settings__movie=self.object, date=next_day) \
+            .order_by('settings__time_start')
         context['all_sessions'] = MovieSession.objects.filter(settings__movie=self.object,
-                                                      date__gte=timezone.now())
+                                                              date__gte=timezone.now()) \
+            .order_by('date', 'settings__time_start')
 
         return context
 
@@ -172,11 +183,11 @@ class SessionView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['all_sessions'] = MovieSession.objects.filter(settings__movie=self.object.settings.movie,
-                                                              date__gte=timezone.now())
+        context['all_sessions'] = MovieSession.objects.filter(date__gte=timezone.now()) \
+            .exclude(date=timezone.now(), settings__time_start__lte=timezone.now())
         cols = self.object.settings.hall.sits_cols
         rows = self.object.settings.hall.sits_rows
-        context['last_col_sits'] = [rows * col for col in range(1, cols+1)]
+        context['last_col_sits'] = [rows * col for col in range(1, cols + 1)]
         return context
 
 

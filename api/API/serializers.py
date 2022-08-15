@@ -1,6 +1,10 @@
+import datetime
+
+from django.utils import timezone
 from rest_framework import serializers
 
-from cinema.models import Genre, Movie, Hall, MovieSession, MovieSessionSettings, Order, CinemaUser
+from cinema.models import Genre, Movie, Hall, Order, CinemaUser
+from cinema.models import MovieSession, MovieSessionSettings
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -38,11 +42,38 @@ class MovieSessionSettingsSerializer(serializers.ModelSerializer):
         model = MovieSessionSettings
         fields = '__all__'
 
+    def validate(self, data):
+        hall = data['hall']
+        start = data.get('date_start', timezone.now().date())
+        end = data['date_end']
 
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = '__all__'
+        # avoid date end < start
+        if start < timezone.now().date():
+            raise serializers.ValidationError({'date_start': 'Can not create sessions for past'})
+        # avoid date end < start
+
+        if end < start:
+            raise serializers.ValidationError("Date end can not be less than date start")
+        time_start = data['time_start']
+        time_end = data['time_end']
+
+        # avoid time end < start
+        if time_end <= time_start:
+            raise serializers.ValidationError("Time end can not be less than time start or equal")
+
+        # avoid creating sessions crossed by hall same date same time
+        sessions = MovieSessionSettings.objects.filter(hall=hall)
+        if self.instance:
+            sessions = sessions.exclude(pk=self.instance.pk)
+        for session in sessions:
+            cross_days = (session.date_start <= start <= session.date_end) or (
+                        session.date_start <= end <= session.date_end)
+            cross_hours = (session.time_start <= time_start <= session.time_end) or (
+                        session.time_start <= time_end <= session.time_end)
+            if cross_days and cross_hours:
+                raise serializers.ValidationError(f"Session crosses at least with session id#{session.pk}")
+
+        return data
 
 
 class CinemaUserSerializer(serializers.ModelSerializer):
@@ -59,3 +90,36 @@ class CinemaUserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    customer = serializers.PrimaryKeyRelatedField(read_only=True)
+    sits = serializers.ListField(child=serializers.IntegerField(min_value=1))
+
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+    def validate(self, data):
+        sits = data['sits']
+        session = data['session']
+        start = datetime.datetime.combine(session.date, session.settings.time_start)
+        list_of_free = [int(sit) for sit, ordered in session.sits.items() if not ordered]
+        string_of_free = ', '.join(str(x) for x in list_of_free)
+
+        for sit in sits:
+            if not (1 <= sit <= len(session.sits)):
+                raise serializers.ValidationError(
+                    {'sits': f'Sit has to be positive number from list of free sits at this time: {string_of_free}.'})
+            if sit not in list_of_free:
+                raise serializers.ValidationError(
+                    {'sits': f'One or more sits from your order are not free already. '
+                     f'Free numbers at this time: {string_of_free}.'})
+
+        if len(sits) > len(set(sits)):
+            raise serializers.ValidationError({'sits': 'Sits are duplicated'})
+
+        if timezone.now() > start:
+            raise serializers.ValidationError('Current session is already expired.')
+
+        return data
