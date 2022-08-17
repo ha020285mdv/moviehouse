@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
+    'coverage',
     'rest_framework',
     'rest_framework.authtoken',
     'cinema',
@@ -140,7 +141,7 @@ LOGOUT_REDIRECT_URL = 'login'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MINUTES_TO_LOGOUT_IF_INACTIVE = 100
-MINUTES_DRF_TOKEN_LIFE_TIME = 10000000000
+MINUTES_DRF_TOKEN_LIFE_TIME = 1000000
 
 # Channels
 ASGI_APPLICATION = 'moviehouse.asgi.application'
@@ -159,3 +160,11 @@ REST_FRAMEWORK = {
         'api.API.authetication.TokenWithLifeTimeAuthentication',
     ],
 }
+
+
+# CELERY STUFF
+BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

@@ -39,7 +39,7 @@ class MovieUpdateForm(ModelForm):
                 (cleaned_data['trailer'] and cleaned_data['teaser'] and cleaned_data['img_landscape']):
             raise ValidationError("Media data are required for advertising")
 
-        if Order.objects.filter(session__settings__movie=self.instance):
+        if Order.objects.filter(sits__session__settings__movie=self.instance):
             raise ValidationError("Can't edit: movie already ordered")
 
 
@@ -51,7 +51,7 @@ class SettingsCreateForm(ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         # avoid updating sessions which already ordered
-        if self.instance and Order.objects.filter(session__settings=self.instance):
+        if self.instance and Order.objects.filter(sits__session__settings=self.instance):
             raise ValidationError("Can't edit: sessions already in orders")
 
         hall = cleaned_data['hall']

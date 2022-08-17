@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django.utils import timezone
 
-from cinema.models import CinemaUser, Order, MovieSession
+from cinema.models import CinemaUser, Order, MovieSession, Sit
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -35,13 +35,14 @@ class OrderForm(ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        sits = dict.fromkeys(self.request.POST.getlist("sit", []), True)
+        sits = self.request.POST.getlist("sit")
+        sits_set = Sit.objects.filter(id__in=sits)
         session = MovieSession.objects.get(pk=self.request.POST.get("session"))
         start = datetime.datetime.combine(session.date, session.settings.time_start)
 
         if timezone.now() > start:
             raise ValidationError('Current session is already expired.')
 
-        for sit in sits:
-            if session.sits[sit]:
-                raise ValidationError('One or more sits from your order are not free already. Please choose new.')
+        for sit in sits_set:
+            if sit not in session.free_sits:
+                raise ValidationError(f'Sit #{sit.number} from your order are not free already. Please choose new.')

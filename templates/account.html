@@ -26,22 +26,22 @@
                 <hr>
                 <div class="row">
 
-                  <p>{{sum}}$ TOTAL amount spent<br>
-                     {{count.session__count}} pcs purchases are done</p>
+                  <p>{{sum.sits__session__settings__price__sum}}$ TOTAL amount spent<br>
+                     {{count}} pcs tickets were bought</p>
 
                   {% if recent_orders %}
                   <hr>
                   <div>
-                  <h5 class="comment-title">Recently ordered:</h5>
+                  <h5 class="comment-title">Recently ordered tickets:</h5>
                   <table class="table">
                       <tbody>
                         {% for order in recent_orders %}
                         <tr class="bg-info">
-                          <td scope="row"><a href="{% url 'session' order.session.pk %}">{% if today == order.session.date %}today,<br>{{order.session.settings.time_start|date:'G:i'}}{% else %}{{order.session.date|date:'M.j,Y'}}{% endif %}</a></td>
-                          <td><font color="{{order.session.settings.hall.name}}">{{order.session.settings.hall.name|upper}}</font></td>
-                          <td><a href="{% url 'movie' order.session.settings.movie.pk %}">{{order.session.settings.movie.title}}</a></td>
-                          <td>{{order.session.settings.price}}$</td>
-                          <td>{% for key in order.sits %}<button type="button" class="btn btn-outline-secondary" style="width:40px;" disabled>{{key}}</button>{% endfor %}</td>
+                          <td scope="row"><a href="{% url 'session' order.sits.session.pk %}">{% if today == order.sits.session.date %}today,<br>{{order.sits.session.settings.time_start|date:'G:i'}}{% else %}{{order.sits.session.date|date:'M.j,Y'}}{% endif %}</a></td>
+                          <td><font color="{{order.sits.session.settings.hall.name}}">{{order.sits.session.settings.hall.name|upper}}</font></td>
+                          <td><a href="{% url 'movie' order.sits.session.settings.movie.pk %}">{{order.sits.session.settings.movie.title}}</a></td>
+                          <td>{{order.sits.session.settings.price}}$</td>
+                          <td><button type="button" class="btn btn-outline-secondary" style="width:40px;" disabled>{{order.sits.number}}</button></td>
                         </tr>
                         {% endfor %}
                       </tbody>
@@ -65,13 +65,13 @@
                       <tbody>
                         {% for order in orders %}
                         <tr
-                         {% if today == order.session.date %}class="table-success"{% endif %}
-                         {% if today < order.session.date %} class="table-info"{% endif %}>
-                        <td scope="row"><a href="{% url 'session' order.session.pk %}">{% if today == order.session.date %}today,<br>{{order.session.settings.time_start|date:'G:i'}}{% else %}{{order.session.date|date:'M.j,Y'}}{% endif %}</a></td>
-                          <td><font color="{{order.session.settings.hall.name}}">{{order.session.settings.hall.name|upper}}</font></td>
-                          <td><a href="{% url 'movie' order.session.settings.movie.pk %}">{{order.session.settings.movie.title}}</a></td>
-                          <td>{{order.session.settings.price}}$</td>
-                          <td>{% for key in order.sits %}<button type="button" class="btn btn-outline-secondary"  style="width:40px;" disabled>{{key}}</button>{% endfor %}</td>
+                         {% if today == order.sits.session.date %}class="table-success"{% endif %}
+                         {% if today < order.sits.session.date %} class="table-info"{% endif %}>
+                        <td scope="row"><a href="{% url 'session' order.sits.session.pk %}">{% if today == order.sits.session.date %}today,<br>{{order.sits.session.settings.time_start|date:'G:i'}}{% else %}{{order.sits.session.date|date:'M.j,Y'}}{% endif %}</a></td>
+                          <td><font color="{{order.sits.session.settings.hall.name}}">{{order.sits.session.settings.hall.name|upper}}</font></td>
+                          <td><a href="{% url 'movie' order.sits.session.settings.movie.pk %}">{{order.sits.session.settings.movie.title}}</a></td>
+                          <td>{{order.sits.session.settings.price}}$</td>
+                          <td><button type="button" class="btn btn-outline-secondary"  style="width:40px;" disabled>{{order.sits.number}}</button></td>
                         </tr>
                         {% endfor %}
                       </tbody>

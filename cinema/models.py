@@ -55,18 +55,21 @@ class Hall(models.Model):
 class MovieSession(models.Model):
     settings = models.ForeignKey('MovieSessionSettings', on_delete=CASCADE)
     date = models.DateField()
-    sits = models.JSONField()
 
     class Meta:
         ordering = ['date']
 
     @property
+    def free_sits(self):
+        return Sit.objects.filter(session=self, order__isnull=True)
+
+    @property
     def free_sits_number(self):
-        return len([sit for sit, sold in self.sits.items() if not sold])
+        return len(self.free_sits)
 
     @property
     def sold(self):
-        return len(self.sits) - self.free_sits_number
+         return self.settings.hall.hall_capacity - self.free_sits_number
 
     def __str__(self):
         return f'{self.settings.hall.name}: {self.date} ' \
@@ -85,20 +88,20 @@ class MovieSessionSettings(models.Model):
     class Meta:
         ordering = ['-date_start']
 
-    def __str__(self):
-        return f'{self.movie} ({self.hall.name}) {self.date_start} to ' \
-               f'{self.date_end} ({self.time_start}-{self.time_end}) {self.price}$'
-
     def save(self, **kwargs):
         if self.id:
             MovieSession.objects.filter(settings=self).delete()
         super().save(**kwargs)
         delta = self.date_end - self.date_start
         for day in range(delta.days + 1):
-            MovieSession.objects.create(settings=self,
-                                        date=self.date_start + timezone.timedelta(days=day),
-                                        sits={sit_number: False for sit_number in range(1, self.hall.hall_capacity + 1)}
-                                        )
+            session = MovieSession.objects.create(settings=self, date=self.date_start + timezone.timedelta(days=day))
+            for sit in range(1, self.hall.hall_capacity + 1):
+                Sit.objects.create(session=session, number=sit)
+
+    def __str__(self):
+        return f'{self.movie} ({self.hall.name}) {self.date_start} to ' \
+               f'{self.date_end} ({self.time_start}-{self.time_end}) {self.price}$'
+
 
 
 class CinemaUser(AbstractUser):
@@ -117,9 +120,16 @@ class CinemaUser(AbstractUser):
 
 class Order(models.Model):
     customer = models.ForeignKey(CinemaUser, on_delete=CASCADE)
-    session = models.ForeignKey(MovieSession, on_delete=CASCADE)
     datetime = models.DateTimeField(auto_now=True)
-    sits = models.JSONField()
+    sits = models.ForeignKey('Sit', on_delete=CASCADE)
 
     def __str__(self):
-        return f'{self.customer} {len(self.sits)} sits in {self.datetime}'
+        return f'{self.customer} #{self.sits.number} for {self.datetime}'
+
+
+class Sit(models.Model):
+    session = models.ForeignKey(MovieSession, on_delete=CASCADE)
+    number = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
+
+    class Meta:
+        unique_together = ['session', 'number']

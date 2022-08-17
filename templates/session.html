@@ -8,7 +8,7 @@
 
         <!-- ======= Single Post Content ======= -->
         <div class="movie">
-            <div class="post-meta"><span class="date">{% for genre in object.settings.movie.genres.all %} {{genre}} / {% endfor %}</span>  <!--  <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span>--> </div>
+            <div class="post-meta"><span class="date">{% for genre in object.settings.movie.genres.all %} {{genre.name}} / {% endfor %}</span>  <!--  <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span>--> </div>
           <h1 class="mb-5"><a href="{% url 'movie' object.settings.movie.pk %}">{{object.settings.movie.title}}</a></h1>
           <h2 class="mb-5">{{object.date}} ({{object.settings.time_start}} - {{object.settings.time_end}})</h2>
           <figcaption>age policy: {{object.settings.movie.get_age_policy_display}}</figcaption>
@@ -24,21 +24,19 @@
             {% csrf_token %}
             <div class="sits mb-3">
                 <div class="btn-group-sm btn-block">
-                    {% for sit, value in object.sits.items %}
-                        <input type="checkbox" class="btn-check" id="btncheck{{sit}}" name="sit"  value="{{sit}}" {% if value %}disabled{% endif %}>
-                        <label class="btn btn-outline-primary btn-block" style="width:40px;" for="btncheck{{sit}}">{{sit}}</label>
+                    {% for sit in object.sit_set.all %}
+                        <input type="checkbox" class="btn-check" id="btncheck{{sit.number}}" name="sit"  value="{{sit.pk}}" {% if sit.order_set.all %}disabled{% endif %}>
+                        <label class="btn btn-outline-primary btn-block" style="width:40px;" for="btncheck{{sit.number}}">{{sit.number}}</label>
                         {% if forloop.counter in last_col_sits %}<br>{% endif %}
                     {% endfor %}
                 </div>
-
+                <input type="hidden" name="session" value="{{object.pk}}">
                     <br>
-            <input type="hidden" name="session" value="{{object.pk}}">
             {% if object.free_sits_number > 0 %}<button type="submit" class="btn btn-success">ORDER TICKETS</button>{% else %}SOLD OUT{% endif %}
             </div>
           </form>
 
           <br>
-
 
           <div class="aside-block">
             <h3 class="aside-title">all sessions:</h3>

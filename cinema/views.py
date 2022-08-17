@@ -4,13 +4,13 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, LoginView
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.views.generic import TemplateView, CreateView, ListView, DetailView
 
 from cinema.forms import CustomUserCreationForm, OrderForm
-from cinema.models import CinemaUser, Movie, MovieSession, Order
+from cinema.models import CinemaUser, Movie, MovieSession, Order, Sit
 
 
 class IndexView(ListView):
@@ -31,13 +31,13 @@ class IndexView(ListView):
         context['tomorrows_sessions'] = MovieSession.objects.filter(date=(timezone.now() + timedelta(1))). \
             order_by('settings__time_start')
 
-        # calculating bestsellers
-        orders_last_30_days = Order.objects.filter(session__date__lte=timezone.now(),
-                                                   session__date__gte=(timezone.now() - timedelta(minutes=60*24*30)))
-        movies = {}
-        for order in orders_last_30_days:
-            movies[order.session.settings.movie] = movies.get(order.session.settings.movie, 0) + len(order.sits)
-        context['bestsellers'] = {k: v for k, v in sorted(movies.items(), key=lambda item: item[1], reverse=True)}
+        # # calculating bestsellers
+        # orders_last_30_days = Order.objects.filter(session__date__lte=timezone.now(),
+        #                                            session__date__gte=(timezone.now() - timedelta(minutes=60*24*30)))
+        # movies = {}
+        # for order in orders_last_30_days:
+        #     movies[order.session.settings.movie] = movies.get(order.session.settings.movie, 0) + len(order.sits)
+        # context['bestsellers'] = {k: v for k, v in sorted(movies.items(), key=lambda item: item[1], reverse=True)}
 
         return context
 
@@ -80,13 +80,13 @@ class AccountView(ListView):
     extra_context = {'title': 'Account | Popcorn cinema'}
 
     def get_queryset(self):
-        return self.model.objects.filter(customer=self.request.user).order_by('-session__date')
+        return self.model.objects.filter(customer=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['count'] = Order.objects.filter(customer=self.request.user).aggregate(Count('session'))
         orders = Order.objects.filter(customer=self.request.user)
-        context['sum'] = sum([order.session.settings.price * len(order.sits) for order in orders])
+        context['count'] = len(orders)
+        context['sum'] = orders.aggregate(Sum('sits__session__settings__price'))
         context['today'] = timezone.now().date()
         fresh_interval = timezone.now() - timedelta(minutes=15)
         context['recent_orders'] = Order.objects.filter(customer=self.request.user, datetime__gte=fresh_interval)
@@ -169,8 +169,8 @@ class MovieView(DetailView):
         next_day = timezone.now() + timedelta(1)
         context['tomorrow_sessions'] = MovieSession.objects.filter(settings__movie=self.object, date=next_day) \
             .order_by('settings__time_start')
-        context['all_sessions'] = MovieSession.objects.filter(settings__movie=self.object,
-                                                              date__gte=timezone.now()) \
+        context['all_sessions'] = MovieSession.objects.filter(settings__movie=self.object, date__gte=timezone.now())\
+            .exclude(settings__movie=self.object, date=timezone.now(), settings__time_start__lte=timezone.now())\
             .order_by('date', 'settings__time_start')
 
         return context
@@ -183,7 +183,9 @@ class SessionView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['all_sessions'] = MovieSession.objects.filter(date__gte=timezone.now()) \
+        current_movie = self.get_object().settings.movie
+        context['all_sessions'] = MovieSession.objects.filter(settings__movie=current_movie,
+                                                              date__gte=timezone.now())\
             .exclude(date=timezone.now(), settings__time_start__lte=timezone.now())
         cols = self.object.settings.hall.sits_cols
         rows = self.object.settings.hall.sits_rows
@@ -203,13 +205,9 @@ class OrderView(LoginRequiredMixin, CreateView):
 
         form = self.form_class(request.POST, request=request)
         if form.is_valid():
-            sits = dict.fromkeys(request.POST.getlist("sit", []), True)
-            session = MovieSession.objects.get(pk=request.POST.get("session"))
-            Order.objects.create(customer=self.request.user,
-                                 session=session,
-                                 sits=sits)
-            session.sits.update(sits)
-            session.save()
+            sits = request.POST.getlist("sit", [])
+            for sit in sits:
+                Order.objects.create(customer=self.request.user, sits=Sit.objects.get(pk=sit))
             messages.success(self.request, "Your purchase is done. Tickets are in your account")
             return redirect('account')
         else:

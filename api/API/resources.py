@@ -11,7 +11,7 @@ from api.API.permissions import IsAdminOrReadOnly, IsAdminOrCreateOnlyOrReadOwnF
     IsAdminOrCreateOnlyForUsers
 from api.API.serializers import GenreSerializer, MovieSerializer, HallSerializer, MovieSessionSerializer
 from api.API.serializers import MovieSessionSettingsSerializer, OrderSerializer, CinemaUserSerializer
-from cinema.models import Genre, Movie, Hall, Order, CinemaUser
+from cinema.models import Genre, Movie, Hall, Order, CinemaUser, Sit
 from cinema.models import MovieSession, MovieSessionSettings
 
 
@@ -63,11 +63,9 @@ class MovieSessionSettingsViewSet(ModelViewSet):
         delta = end - start
         setting = serializer.save(date_start=start)
         for day in range(delta.days + 1):
-            MovieSession.objects.create(settings=setting,
-                                        date=start + timezone.timedelta(days=day),
-                                        sits={sit_number: False for sit_number
-                                              in range(1, setting.hall.hall_capacity + 1)}
-                                        )
+            session = MovieSession.objects.create(settings=setting, date=start + timezone.timedelta(days=day))
+            for sit in range(1, setting.hall.hall_capacity + 1):
+                Sit.objects.create(session=session, number=sit)
 
     def perform_destroy(self, instance):
         if Order.objects.filter(session__settings=instance):
@@ -95,12 +93,10 @@ class OrderViewSet(mixins.CreateModelMixin,
         return self.queryset if self.request.user.is_superuser else self.queryset.filter(customer=self.request.user)
 
     def perform_create(self, serializer):
-        sits = dict.fromkeys(serializer.validated_data.get('sits'), True)
+        sits = serializer.validated_data.get('sits')
         session = serializer.validated_data.get('session')
-        session.sits.update(sits)
-        with transaction.atomic():
-            serializer.save(customer=self.request.user, sits=sits)
-            session.save()
+        for sit in sits:
+            Order.objects.create(customer=self.request.user, sits=Sit.objects.get(session=session, number=int(sit)))
 
 
 class UserViewSet(ModelViewSet):

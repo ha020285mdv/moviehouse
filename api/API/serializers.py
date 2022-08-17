@@ -34,7 +34,7 @@ class MovieSessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MovieSession
-        fields = ['id', 'date', 'time_start', 'time_end', 'movie', 'hall', 'price', 'sits']
+        fields = ['id', 'date', 'time_start', 'time_end', 'movie', 'hall', 'price']
 
 
 class MovieSessionSettingsSerializer(serializers.ModelSerializer):
@@ -94,6 +94,7 @@ class CinemaUserSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     customer = serializers.PrimaryKeyRelatedField(read_only=True)
+    session = serializers.IntegerField(write_only=True)
     sits = serializers.ListField(child=serializers.IntegerField(min_value=1))
 
     class Meta:
@@ -101,14 +102,15 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
+        print(data)
         sits = data['sits']
-        session = data['session']
+        session = MovieSession.objects.get(pk=data['session'])
         start = datetime.datetime.combine(session.date, session.settings.time_start)
-        list_of_free = [int(sit) for sit, ordered in session.sits.items() if not ordered]
+        list_of_free = session.free_sits.values_list('number', flat=True)
         string_of_free = ', '.join(str(x) for x in list_of_free)
 
         for sit in sits:
-            if not (1 <= sit <= len(session.sits)):
+            if not (1 <= sit <= session.settings.hall.hall_capacity):
                 raise serializers.ValidationError(
                     {'sits': f'Sit has to be positive number from list of free sits at this time: {string_of_free}.'})
             if sit not in list_of_free:

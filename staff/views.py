@@ -56,7 +56,7 @@ class HallListView(SuperUserRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(HallListView, self).get_context_data(**kwargs)
-        context['ordered'] = [hall for hall in Hall.objects.all() if Order.objects.filter(session__settings__hall=hall)]
+        context['ordered'] = [hall for hall in Hall.objects.all() if Order.objects.filter(sits__session__settings__hall=hall)]
         return context
 
 
@@ -91,7 +91,7 @@ class MovieListView(SuperUserRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(MovieListView, self).get_context_data(**kwargs)
         context['ordered'] = [movie for movie in Movie.objects.all() if
-                              Order.objects.filter(session__settings__movie=movie)]
+                              Order.objects.filter(sits__session__settings__movie=movie)]
         return context
 
 
@@ -125,7 +125,7 @@ class MovieSessionSettingsListView(SuperUserRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(MovieSessionSettingsListView, self).get_context_data(**kwargs)
         context['ordered'] = [setting for setting in MovieSessionSettings.objects.all() if
-                              Order.objects.filter(session__settings=setting)]
+                              Order.objects.filter(sits__session__settings=setting)]
         return context
 
 
