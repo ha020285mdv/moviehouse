@@ -10,7 +10,7 @@ from staff.forms import GenreCreateForm, HallCreateForm, HallUpdateForm, MovieUp
 
 
 class SuperUserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
-    login_url = 'login/'
+    login_url = reverse_lazy('login')
 
     def test_func(self):
         return self.request.user.is_superuser

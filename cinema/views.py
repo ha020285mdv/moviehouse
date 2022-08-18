@@ -72,7 +72,7 @@ class LogoutView(LoginRequiredMixin, LogoutView):
     success_url = '/'
 
 
-class AccountView(ListView):
+class AccountView(LoginRequiredMixin, ListView):
     template_name = 'account.html'
     paginate_by = 20
     model = Order

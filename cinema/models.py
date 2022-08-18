@@ -123,6 +123,9 @@ class Order(models.Model):
     datetime = models.DateTimeField(auto_now=True)
     sits = models.ForeignKey('Sit', on_delete=CASCADE)
 
+    class Meta:
+        ordering = ['datetime']
+
     def __str__(self):
         return f'{self.customer} #{self.sits.number} for {self.datetime}'
 

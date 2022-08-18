@@ -16,4 +16,4 @@ class CustomUserActivityCheckerMiddleware(MiddlewareMixin):
             if last_activity_at:
                 if timezone.now() > (last_activity_at + timedelta(minutes=MINUTES_TO_LOGOUT_IF_INACTIVE)):
                     logout(request)
-        cache.set('last_request', timezone.now())
+            cache.set('last_request', timezone.now())
