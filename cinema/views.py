@@ -31,13 +31,13 @@ class IndexView(ListView):
         context['tomorrows_sessions'] = MovieSession.objects.filter(date=(timezone.now() + timedelta(1))). \
             order_by('settings__time_start')
 
-        # # calculating bestsellers
-        # orders_last_30_days = Order.objects.filter(session__date__lte=timezone.now(),
-        #                                            session__date__gte=(timezone.now() - timedelta(minutes=60*24*30)))
-        # movies = {}
-        # for order in orders_last_30_days:
-        #     movies[order.session.settings.movie] = movies.get(order.session.settings.movie, 0) + len(order.sits)
-        # context['bestsellers'] = {k: v for k, v in sorted(movies.items(), key=lambda item: item[1], reverse=True)}
+        # calculating bestsellers
+        orders_last_30_days = Order.objects.filter(datetime__lte=timezone.now(),
+                                                   datetime__gte=(timezone.now() - timedelta(minutes=60*24*30)))
+        movies = {}
+        for order in orders_last_30_days:
+            movies[order.sits.session.settings.movie] = movies.get(order.sits.session.settings.movie, 0) + 1
+        context['bestsellers'] = {k: v for k, v in sorted(movies.items(), key=lambda item: item[1], reverse=True)}
 
         return context
 

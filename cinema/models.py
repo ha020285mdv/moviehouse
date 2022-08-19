@@ -95,8 +95,10 @@ class MovieSessionSettings(models.Model):
         delta = self.date_end - self.date_start
         for day in range(delta.days + 1):
             session = MovieSession.objects.create(settings=self, date=self.date_start + timezone.timedelta(days=day))
+            seats = []
             for sit in range(1, self.hall.hall_capacity + 1):
-                Sit.objects.create(session=session, number=sit)
+                seats.append(Sit(session=session, number=sit))
+            Sit.objects.bulk_create(seats)
 
     def __str__(self):
         return f'{self.movie} ({self.hall.name}) {self.date_start} to ' \

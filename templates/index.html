@@ -78,31 +78,27 @@
 
           <div class="col-lg-8">
             <div class="row g-5">
+
               <div class="col-lg-4 border-start custom-border">
-                <div class="post-entry-1">
-                  <a href="movie.html"><img src="static/img/post-landscape-2.jpg" alt="" class="img-fluid"></a>
-                  <div class="post-meta"><span class="date">Sport</span> <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span></div>
-                  <h2><a href="single-post.html">Let’s Get Back to Work, New York</a></h2>
-                </div>
-                <div class="post-entry-1">
-                  <a href="movie.html"><img src="static/img/post-landscape-5.jpg" alt="" class="img-fluid"></a>
-                  <div class="post-meta"><span class="date">Food</span> <span class="mx-1">&bullet;</span> <span>Jul 17th '22</span></div>
-                  <h2><a href="movie.html">How to Avoid Distraction and Stay Focused During Video Calls?</a></h2>
-                </div>
+              {% for movie in movies|slice:":2" %}
+                  <div class="post-entry-1">
+                    <a href="{% url 'movie' movie.pk %}"><img src="{{movie.img_small.url}}" alt="" class="img-fluid" width="200" height="80"></a>
+                    <div class="post-meta"><span class="date">Sport</span> <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span></div>
+                    <h2><a href="{% url 'movie' movie.pk %}">{{ movie.title }}</a></h2>
+                  </div>
+              {% endfor %}
               </div>
-              
+
               <div class="col-lg-4 border-start custom-border">
-                <div class="post-entry-1">
-                  <a href="movie.html"><img src="static/img/post-landscape-3.jpg" alt="" class="img-fluid"></a>
-                  <div class="post-meta"><span class="date">Business</span> <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span></div>
-                  <h2><a href="movie.html">6 Easy Steps To Create Your Own Cute Merch For Instagram</a></h2>
-                </div>
-                <div class="post-entry-1">
-                  <a href="movie.html"><img src="static/img/post-landscape-6.jpg" alt="" class="img-fluid"></a>
-                  <div class="post-meta"><span class="date">Tech</span> <span class="mx-1">&bullet;</span> <span>Mar 1st '22</span></div>
-                  <h2><a href="movie.html">10 Life-Changing Hacks Every Working Mom Should Know</a></h2>
-                </div>
+              {% for movie in movies|slice:"2:4" %}
+                  <div class="post-entry-1">
+                    <a href="{% url 'movie' movie.pk %}"><img src="{{movie.img_small.url}}" alt="" class="img-fluid" width="200" height="80"></a>
+                    <div class="post-meta"><span class="date">Sport</span> <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span></div>
+                    <h2><a href="{% url 'movie' movie.pk %}">{{ movie.title }}</a></h2>
+                  </div>
+              {% endfor %}
               </div>
+
 
               <!-- Trending Section -->
               <div class="col-lg-4">
@@ -111,13 +107,15 @@
                   <h3>Most visited</h3>
                   <ul class="trending-post">
                       {% for bestseller in bestsellers  %}
-                      <li>
-                        <a href="{% url 'movie' bestseller.pk %}">
-                          <span class="number">{{forloop.counter}}</span>
-                          <h3>{{bestseller}}</h3>
-                            <span class="author">{{bestseller.starring}}</span>
-                        </a>
-                      </li>
+                        {% if forloop.counter < 6 %}
+                          <li>
+                            <a href="{% url 'movie' bestseller.pk %}">
+                              <span class="number">{{forloop.counter}}</span>
+                              <h3>{{bestseller}}</h3>
+                                <span class="author">{{bestseller.starring}}</span>
+                            </a>
+                          </li>
+                        {% endif %}
                       {% endfor %}
                   </ul>
                 </div>
