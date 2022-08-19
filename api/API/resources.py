@@ -59,22 +59,16 @@ class MovieSessionSettingsViewSet(ModelViewSet):
 
     def perform_create(self, serializer, obj=None):
         start = serializer.validated_data.get('date_start', timezone.now().date())
-        end = serializer.validated_data.get('date_end')
-        delta = end - start
-        setting = serializer.save(date_start=start)
-        for day in range(delta.days + 1):
-            session = MovieSession.objects.create(settings=setting, date=start + timezone.timedelta(days=day))
-            for sit in range(1, setting.hall.hall_capacity + 1):
-                Sit.objects.create(session=session, number=sit)
+        serializer.save(date_start=start)
 
     def perform_destroy(self, instance):
-        if Order.objects.filter(session__settings=instance):
+        if Order.objects.filter(sits__session__settings=instance):
             raise serializers.ValidationError("Can't delete: sessions already in orders")
         instance.delete()
 
     def perform_update(self, serializer):
         obj = self.get_object()
-        if Order.objects.filter(session__settings=obj):
+        if Order.objects.filter(sits__session__settings=obj):
             raise serializers.ValidationError("Can't update: sessions already in orders")
         MovieSession.objects.filter(settings=obj).delete()
         self.perform_create(serializer)

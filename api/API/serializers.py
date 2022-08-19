@@ -54,6 +54,7 @@ class MovieSessionSettingsSerializer(serializers.ModelSerializer):
 
         if end < start:
             raise serializers.ValidationError("Date end can not be less than date start")
+
         time_start = data['time_start']
         time_end = data['time_end']
 
@@ -102,7 +103,6 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        print(data)
         sits = data['sits']
         session = MovieSession.objects.get(pk=data['session'])
         start = datetime.datetime.combine(session.date, session.settings.time_start)

@@ -21,6 +21,7 @@ class UserFactory(factory.Factory):
 
 class SuperUserFactory(UserFactory):
     is_superuser = True
+    is_staff = True
 
 
 class GenreFactory(factory.Factory):
