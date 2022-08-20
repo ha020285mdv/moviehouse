@@ -4,8 +4,9 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView, LoginView
-from django.db.models import Count, Sum
+from django.db.models import Sum
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import TemplateView, CreateView, ListView, DetailView
 
@@ -33,7 +34,7 @@ class IndexView(ListView):
 
         # calculating bestsellers
         orders_last_30_days = Order.objects.filter(datetime__lte=timezone.now(),
-                                                   datetime__gte=(timezone.now() - timedelta(minutes=60*24*30)))
+                                                   datetime__gte=(timezone.now() - timedelta(minutes=60 * 24 * 30)))
         movies = {}
         for order in orders_last_30_days:
             movies[order.sits.session.settings.movie] = movies.get(order.sits.session.settings.movie, 0) + 1
@@ -78,9 +79,10 @@ class AccountView(LoginRequiredMixin, ListView):
     model = Order
     context_object_name = 'orders'
     extra_context = {'title': 'Account | Popcorn cinema'}
+    login_url = reverse_lazy('login')
 
     def get_queryset(self):
-        return self.model.objects.filter(customer=self.request.user)
+        return self.model.objects.filter(customer=self.request.user).order_by('-sits__session__date')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -169,8 +171,8 @@ class MovieView(DetailView):
         next_day = timezone.now() + timedelta(1)
         context['tomorrow_sessions'] = MovieSession.objects.filter(settings__movie=self.object, date=next_day) \
             .order_by('settings__time_start')
-        context['all_sessions'] = MovieSession.objects.filter(settings__movie=self.object, date__gte=timezone.now())\
-            .exclude(settings__movie=self.object, date=timezone.now(), settings__time_start__lte=timezone.now())\
+        context['all_sessions'] = MovieSession.objects.filter(settings__movie=self.object, date__gte=timezone.now()) \
+            .exclude(settings__movie=self.object, date=timezone.now(), settings__time_start__lte=timezone.now()) \
             .order_by('date', 'settings__time_start')
 
         return context
@@ -185,7 +187,7 @@ class SessionView(DetailView):
         context = super().get_context_data(**kwargs)
         current_movie = self.get_object().settings.movie
         context['all_sessions'] = MovieSession.objects.filter(settings__movie=current_movie,
-                                                              date__gte=timezone.now())\
+                                                              date__gte=timezone.now()) \
             .exclude(date=timezone.now(), settings__time_start__lte=timezone.now())
         cols = self.object.settings.hall.sits_cols
         rows = self.object.settings.hall.sits_rows

@@ -16,5 +16,4 @@ urlpatterns = [
     path('movie/<int:pk>/', MovieView.as_view(), name='movie'),
     path('session/<int:pk>/', SessionView.as_view(), name='session'),
     path('order/', OrderView.as_view(), name='order'),
-
 ]

@@ -140,7 +140,7 @@ LOGOUT_REDIRECT_URL = 'login'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-MINUTES_TO_LOGOUT_IF_INACTIVE = 100
+MINUTES_TO_LOGOUT_IF_INACTIVE = 1
 MINUTES_DRF_TOKEN_LIFE_TIME = 1
 
 # Channels
@@ -168,3 +168,15 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+# Channels
+ASGI_APPLICATION = 'moviehouse.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}

@@ -1,6 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
-from django.utils import timezone
 from django.views.generic import TemplateView, CreateView, ListView, DeleteView, UpdateView
 
 from cinema.models import Genre, Hall, Movie, MovieSessionSettings, MovieSession, Order
@@ -99,20 +98,20 @@ class MovieCreateView(SuperUserRequiredMixin, CreateView):
     model = Movie
     template_name = 'staff-movie-edit.html'
     form_class = MovieUpdateForm
-    success_url = reverse_lazy('movie-list')
+    success_url = reverse_lazy('allmovies')
     extra_context = {'title': 'Movie create | Admin Popcorn cinema'}
 
 
 class MovieDeleteView(SuperUserRequiredMixin, DeleteView):
     model = Movie
-    success_url = reverse_lazy('movie-list')
+    success_url = reverse_lazy('allmovies')
 
 
 class MovieUpdateView(LoginRequiredMixin, UpdateView):
     model = Movie
     template_name = 'staff-movie-edit.html'
     form_class = MovieUpdateForm
-    success_url = reverse_lazy('movie-list')
+    success_url = reverse_lazy('allmovies')
     extra_context = {'title': 'Movie update | Admin Popcorn cinema'}
 
 

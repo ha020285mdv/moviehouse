@@ -16,6 +16,15 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.timezone = settings.TIME_ZONE
 app.conf.enable_utc = False   # !!!important for crontab
 
+app.conf.beat_schedule = {
+    'check-sessions-periodically': {
+        'task': 'staff.tasks.sessions_checker',
+        'schedule': 15.0,
+        'args': ()
+    },
+}
+
+
 #COMMANDS
 #celery -A moviehouse worker --loglevel=INFO
 #celery -A moviehouse beat -l info
