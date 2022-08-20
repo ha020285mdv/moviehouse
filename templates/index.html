@@ -83,7 +83,7 @@
               {% for movie in movies|slice:":2" %}
                   <div class="post-entry-1">
                     <a href="{% url 'movie' movie.pk %}"><img src="{{movie.img_small.url}}" alt="" class="img-fluid" width="200" height="80"></a>
-                    <div class="post-meta"><span class="date">Sport</span> <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span></div>
+                    <div class="post-meta"><span class="date">{% for genre in movie.genres.all %} {{genre}} / {% endfor %}</span> <span class="mx-1"></span></div>
                     <h2><a href="{% url 'movie' movie.pk %}">{{ movie.title }}</a></h2>
                   </div>
               {% endfor %}
@@ -93,7 +93,7 @@
               {% for movie in movies|slice:"2:4" %}
                   <div class="post-entry-1">
                     <a href="{% url 'movie' movie.pk %}"><img src="{{movie.img_small.url}}" alt="" class="img-fluid" width="200" height="80"></a>
-                    <div class="post-meta"><span class="date">Sport</span> <span class="mx-1">&bullet;</span> <span>Jul 5th '22</span></div>
+                    <div class="post-meta"><span class="date">{% for genre in movie.genres.all %} {{genre}} / {% endfor %}</span> <span class="mx-1"></span> </div>
                     <h2><a href="{% url 'movie' movie.pk %}">{{ movie.title }}</a></h2>
                   </div>
               {% endfor %}
